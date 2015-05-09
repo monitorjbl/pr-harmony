@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>$i18n.getText("config.title")</title>
+    $webResourceManager.requireResource("com.monitorjbl.plugins.pr-harmony:resources")
+    <meta name="application-base-url" content="$applicationProperties.getBaseUrl()">
+    <meta name="decorator" content="stash.repository.settings"/>
+    <meta name="projectKey" content="$repositoryProjectKey">
+    <meta name="repositorySlug" content="$repositorySlug">
+    <meta name="activeTab" content="pr-harmony-config">
+</head>
+<body>
+<h2>$i18n.getText("config.header")</h2>
+
+<form id="config" class="aui">
+    <div class="field-group">
+        <label for="requiredReviewers">$i18n.getText("config.defaultReviewers.label")</label>
+        <input class="text" type="text" id="defaultReviewers" name="defaultReviewers">
+        <div class="description">$i18n.getText("config.defaultReviewers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="requiredReviewers">$i18n.getText("config.requiredReviewers.label")</label>
+        <input class="text" type="text" id="requiredReviewers" name="requiredReviewers">
+        <div class="description">$i18n.getText("config.requiredReviewers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="requiredReviewers">$i18n.getText("config.requiredReviews.label")</label>
+        <input class="text" type="text" id="requiredReviews" name="requiredReviews">
+        <div class="description">$i18n.getText("config.requiredReviews.description")</div>
+    </div>
+    <div class="field-group">
+        <input type="submit" value="$i18n.getText('config.save.label')" class="button">
+    </div>
+</form>
+</body>
+</html>
