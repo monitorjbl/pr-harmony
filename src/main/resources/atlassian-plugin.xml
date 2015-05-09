@@ -13,16 +13,20 @@
   <component-import key="repositoryService" interface="com.atlassian.stash.repository.RepositoryService"/>
   <component-import key="permissionService" interface="com.atlassian.stash.user.PermissionService"/>
   <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
   <component-import key="renderer" interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer"/>
   <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
-  <component-import key="transactionTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
+  <component-import key="gitCommandBuilderFactory" interface="com.atlassian.stash.scm.git.GitCommandBuilderFactory"/>
 
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
 
+  <template-context-item key="applicationPropertiesContextItem" component-ref="applicationProperties"
+                         context-key="applicationProperties" name="Application Properties Context Item"/>
   <resource type="i18n" name="i18n" location="com.monitorjbl.plugins.i18n"/>
   <web-resource name="Config Web Resources" key="resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <resource type="download" name="config.js" location="config.js"/>
+    <resource type="download" name="config.css" location="config.css"/>
   </web-resource>
 
   <pre-receive-hook key="commitBlocker" name="Commit Blocker" class="com.monitorjbl.plugins.CommitBlockerHook">
@@ -33,9 +37,9 @@
     <url-pattern>/pr-harmony/*</url-pattern>
   </servlet>
 
-  <!--<rest key="rest" path="/pr-harmony" version="1.0">-->
-  <!--<description>Provides REST resources for the config UI</description>-->
-  <!--</rest>-->
+  <rest key="rest" path="/pr-harmony" version="1.0">
+    <description>Provides REST resources for the config UI</description>
+  </rest>
 
   <web-item key="pr-harmony-config" weight="30"
             section="stash.repository.settings.panel/repository-settings-addons-section">
