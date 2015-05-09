@@ -10,7 +10,6 @@ import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 
 import java.util.Collection;
-import java.util.List;
 
 public class CommitBlockerHook implements PreReceiveHook {
   private final ConfigDao configDao;

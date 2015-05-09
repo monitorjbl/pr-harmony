@@ -19,6 +19,7 @@
   <component-import key="gitCommandBuilderFactory" interface="com.atlassian.stash.scm.git.GitCommandBuilderFactory"/>
 
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
+  <component key="mergeBlocker" class="com.monitorjbl.plugins.MergeBlocker"/>
 
   <template-context-item key="applicationPropertiesContextItem" component-ref="applicationProperties"
                          context-key="applicationProperties" name="Application Properties Context Item"/>
@@ -32,6 +33,7 @@
   <pre-receive-hook key="commitBlocker" name="Commit Blocker" class="com.monitorjbl.plugins.CommitBlockerHook">
     <description>Allows blocking of all direct commits</description>
   </pre-receive-hook>
+  <merge-check key="mergeCheck" class="bean:mergeBlocker"/>
 
   <servlet key="pr-harmony-servlet" class="com.monitorjbl.plugins.config.ConfigServlet">
     <url-pattern>/pr-harmony/*</url-pattern>
