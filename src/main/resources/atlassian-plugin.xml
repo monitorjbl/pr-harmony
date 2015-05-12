@@ -29,7 +29,7 @@
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <resource type="download" name="config.js" location="config.js"/>
     <resource type="download" name="config.css" location="config.css"/>
-    <resource type="download" name="pluginIcon.png" location=""/>
+    <resource type="download" name="pluginIcon.png" location="images/pluginIcon.png"/>
   </web-resource>
 
   <pre-receive-hook key="commitBlocker" name="Commit Blocker" class="com.monitorjbl.plugins.CommitBlockerHook">
