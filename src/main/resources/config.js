@@ -13,7 +13,8 @@
                 defaultReviewers: $('#defaultReviewers').val().split(','),
                 excludedUsers: $('#excludedUsers').val().split(','),
                 blockedCommits: $('#blockedCommits').val().split(','),
-                blockedPRs: $('#blockedPRs').val().split(',')
+                blockedPRs: $('#blockedPRs').val().split(','),
+                automergePRs: $('#automergePRs').val().split(',')
             }),
             success: function (config) {
                 location.reload();
@@ -32,6 +33,7 @@
                 $('#excludedUsers').val(config.excludedUsers);
                 $('#blockedCommits').val(config.blockedCommits);
                 $('#blockedPRs').val(config.blockedPRs);
+                $('#automergePRs').val(config.automergePRs);
             }
         });
     }

@@ -4,6 +4,7 @@ import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
 import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
 import com.atlassian.stash.project.Project;
 import com.atlassian.stash.pull.PullRequest;
+import com.atlassian.stash.pull.PullRequestMergeability;
 import com.atlassian.stash.pull.PullRequestParticipant;
 import com.atlassian.stash.pull.PullRequestRef;
 import com.atlassian.stash.pull.PullRequestRole;
@@ -59,6 +60,8 @@ public class PullRequestListenerTest {
   Project project;
   @Mock
   PullRequestRef ref;
+  @Mock
+  PullRequestMergeability mergeability;
 
   @Before
   public void setUp() throws Exception {
@@ -94,13 +97,9 @@ public class PullRequestListenerTest {
   }
 
   @Test
-  public void testAutomerge_approved() throws Exception {
-    Set<PullRequestParticipant> p = newHashSet(
-        mockParticipant("user1", true)
-    );
-    PullRequestParticipant author = mockParticipant("author", false);
-    when(pr.getReviewers()).thenReturn(p);
-    when(pr.getAuthor()).thenReturn(author);
+  public void testAutomerge_canMerge() throws Exception {
+    when(mergeability.canMerge()).thenReturn(true);
+    when(prService.canMerge(repository.getId(), pr.getId())).thenReturn(mergeability);
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .automergePRs(newArrayList("master"))
         .requiredReviewers(newArrayList("user1"))
@@ -111,13 +110,9 @@ public class PullRequestListenerTest {
   }
 
   @Test
-  public void testAutomerge_blockedApprover() throws Exception {
-    Set<PullRequestParticipant> p = newHashSet(
-        mockParticipant("user1", false)
-    );
-    PullRequestParticipant author = mockParticipant("author", false);
-    when(pr.getReviewers()).thenReturn(p);
-    when(pr.getAuthor()).thenReturn(author);
+  public void testAutomerge_cannotMerge() throws Exception {
+    when(mergeability.canMerge()).thenReturn(false);
+    when(prService.canMerge(repository.getId(), pr.getId())).thenReturn(mergeability);
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .automergePRs(newArrayList("master"))
         .requiredReviewers(newArrayList("user1"))

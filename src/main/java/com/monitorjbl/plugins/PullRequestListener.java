@@ -66,8 +66,8 @@ public class PullRequestListener {
     String branch = pr.getToRef().getId().replaceAll(MergeBlocker.REFS_PREFIX, "");
 
     if (config.getAutomergePRs().contains(branch) && !config.getBlockedPRs().contains(branch) &&
-        new PullRequestApproval(config).isPullRequestApproved(pr)) {
-      prService.merge(repo.getId(), pr.getId(), 1);
+        prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
+      prService.merge(repo.getId(), pr.getId(), pr.getVersion());
     }
   }
 
