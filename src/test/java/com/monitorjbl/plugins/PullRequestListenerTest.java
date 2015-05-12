@@ -71,6 +71,7 @@ public class PullRequestListenerTest {
     when(openedEvent.getPullRequest()).thenReturn(pr);
     when(pr.getToRef()).thenReturn(ref);
     when(pr.getId()).thenReturn(10L);
+    when(pr.getVersion()).thenReturn(10384);
     when(ref.getRepository()).thenReturn(repository);
     when(ref.getId()).thenReturn(MergeBlocker.REFS_PREFIX + "master");
     when(repository.getProject()).thenReturn(project);
@@ -83,7 +84,7 @@ public class PullRequestListenerTest {
   public void testAutomerge_defaultConfig() throws Exception {
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder().build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, never()).merge(repository.getId(), pr.getId(), 1);
+    verify(prService, never()).merge(repository.getId(), pr.getId(), pr.getVersion());
   }
 
   @Test
@@ -93,7 +94,7 @@ public class PullRequestListenerTest {
         .blockedPRs(newArrayList("master"))
         .build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, never()).merge(repository.getId(), pr.getId(), 1);
+    verify(prService, never()).merge(repository.getId(), pr.getId(), pr.getVersion());
   }
 
   @Test
@@ -106,7 +107,7 @@ public class PullRequestListenerTest {
         .requiredReviews(1)
         .build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, times(1)).merge(repository.getId(), pr.getId(), 1);
+    verify(prService, times(1)).merge(repository.getId(), pr.getId(), pr.getVersion());
   }
 
   @Test
@@ -119,7 +120,7 @@ public class PullRequestListenerTest {
         .requiredReviews(1)
         .build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, never()).merge(repository.getId(), pr.getId(), 1);
+    verify(prService, never()).merge(repository.getId(), pr.getId(), pr.getVersion());
   }
 
   @Test
