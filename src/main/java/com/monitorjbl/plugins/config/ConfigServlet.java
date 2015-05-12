@@ -54,7 +54,7 @@ public class ConfigServlet extends HttpServlet {
     if (permissionService.hasRepositoryPermission(stashUser, repo, Permission.REPO_ADMIN)) {
       response.setContentType("text/html;charset=utf-8");
       renderer.render("config.html", ImmutableMap.<String, Object>of(
-          "repositoryProjectKey", coords[0],
+          "projectKey", coords[0],
           "repositorySlug", coords[1]
       ), response.getWriter());
     } else {

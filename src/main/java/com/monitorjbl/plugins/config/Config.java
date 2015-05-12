@@ -6,14 +6,17 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Config {
   private List<String> defaultReviewers;
   private List<String> requiredReviewers;
-  private Double requiredReviews;
+  private Integer requiredReviews;
   private List<String> blockedCommits;
   private List<String> blockedPRs;
+  private List<String> automergePRs;
   private List<String> excludedUsers;
 
   public Config() {
@@ -26,6 +29,7 @@ public class Config {
     setBlockedCommits(builder.blockedCommits);
     setBlockedPRs(builder.blockedPRs);
     setExcludedUsers(builder.excludedUsers);
+    setAutomergePRs(builder.automergePRs);
   }
 
   public List<String> getDefaultReviewers() {
@@ -44,11 +48,11 @@ public class Config {
     this.requiredReviewers = requiredReviewers;
   }
 
-  public Double getRequiredReviews() {
+  public Integer getRequiredReviews() {
     return requiredReviews;
   }
 
-  public void setRequiredReviews(Double requiredReviews) {
+  public void setRequiredReviews(Integer requiredReviews) {
     this.requiredReviews = requiredReviews;
   }
 
@@ -68,6 +72,14 @@ public class Config {
     this.blockedPRs = blockedPRs;
   }
 
+  public List<String> getAutomergePRs() {
+    return automergePRs;
+  }
+
+  public void setAutomergePRs(List<String> automergePRs) {
+    this.automergePRs = automergePRs;
+  }
+
   public List<String> getExcludedUsers() {
     return excludedUsers;
   }
@@ -81,12 +93,13 @@ public class Config {
   }
 
   public static final class Builder {
-    private List<String> defaultReviewers;
-    private List<String> requiredReviewers;
-    private Double requiredReviews;
-    private List<String> blockedCommits;
-    private List<String> blockedPRs;
-    private List<String> excludedUsers;
+    private List<String> defaultReviewers = newArrayList();
+    private List<String> requiredReviewers = newArrayList();
+    private Integer requiredReviews = 0;
+    private List<String> blockedCommits = newArrayList();
+    private List<String> blockedPRs = newArrayList();
+    private List<String> automergePRs = newArrayList();
+    private List<String> excludedUsers = newArrayList();
 
     private Builder() {
     }
@@ -101,7 +114,7 @@ public class Config {
       return this;
     }
 
-    public Builder requiredReviews(Double requiredReviews) {
+    public Builder requiredReviews(Integer requiredReviews) {
       this.requiredReviews = requiredReviews;
       return this;
     }
@@ -113,6 +126,11 @@ public class Config {
 
     public Builder blockedPRs(List<String> blockedPRs) {
       this.blockedPRs = blockedPRs;
+      return this;
+    }
+
+    public Builder automergePRs(List<String> automergePRs) {
+      this.automergePRs = automergePRs;
       return this;
     }
 

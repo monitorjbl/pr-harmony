@@ -29,6 +29,7 @@ public class ConfigDao {
   public static final String EXCLUDED_USERS = "excludedUsers";
   public static final String BLOCKED_COMMITS = "blockedCommits";
   public static final String BLOCKED_PRS = "blockedPRs";
+  public static final String AUTOMERGE_PRS = "automergePRs";
 
   private final PluginSettingsFactory pluginSettingsFactory;
   private final RepositoryService repoService;
@@ -46,24 +47,26 @@ public class ConfigDao {
   public Config getConfigForRepo(String projectKey, String repoSlug) {
     PluginSettings settings = settings(projectKey, repoSlug);
     return Config.builder()
-        .requiredReviews(Double.parseDouble(get(settings, REQUIRED_REVIEWS, "0")))
+        .requiredReviews(Integer.parseInt(get(settings, REQUIRED_REVIEWS, "0")))
         .requiredReviewers(split(get(settings, REQUIRED_REVIWERS, "")))
         .defaultReviewers(split(get(settings, DEFAULT_REVIEWERS, "")))
         .excludedUsers(split(get(settings, EXCLUDED_USERS, "")))
         .blockedCommits(split(get(settings, BLOCKED_COMMITS, "")))
         .blockedPRs(split(get(settings, BLOCKED_PRS, "")))
+        .automergePRs(split(get(settings, AUTOMERGE_PRS, "")))
         .build();
   }
 
   public void setConfigForRepo(String projectKey, String repoSlug, Config config) {
     Predicate<String> branchesFilter = new FilterInvalidBranches(getBranches(projectKey, repoSlug));
     PluginSettings settings = settings(projectKey, repoSlug);
-    settings.put(REQUIRED_REVIEWS, Double.toString(config.getRequiredReviews()));
+    settings.put(REQUIRED_REVIEWS, Integer.toString(config.getRequiredReviews()));
     settings.put(REQUIRED_REVIWERS, join(config.getRequiredReviewers(), new FilterInvalidUsers()));
     settings.put(DEFAULT_REVIEWERS, join(config.getDefaultReviewers(), new FilterInvalidUsers()));
     settings.put(EXCLUDED_USERS, join(config.getExcludedUsers(), new FilterInvalidUsers()));
     settings.put(BLOCKED_COMMITS, join(config.getBlockedCommits(), branchesFilter));
     settings.put(BLOCKED_PRS, join(config.getBlockedPRs(), branchesFilter));
+    settings.put(AUTOMERGE_PRS, join(config.getAutomergePRs(), branchesFilter));
   }
 
   PluginSettings settings(String projectKey, String repoSlug) {

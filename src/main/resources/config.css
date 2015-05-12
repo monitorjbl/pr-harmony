@@ -1,3 +1,23 @@
 form.aui input.config.text {
     max-width: 500px;
 }
+
+.plugin-logo {
+    display: inline-block;
+    background-image: url(pluginIcon.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    width: 28px;
+}
+
+form.aui legend, form.aui .field-group > label {
+    width: 150px;
+}
+
+form.aui .text {
+    margin-left: 20px;
+}
+
+form.aui div.description {
+    margin-left: 20px;
+}

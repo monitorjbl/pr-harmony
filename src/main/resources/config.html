@@ -3,13 +3,16 @@
     <title>$i18n.getText("config.title")</title>
     $webResourceManager.requireResource("com.monitorjbl.plugins.pr-harmony:resources")
     <meta name="decorator" content="stash.repository.settings"/>
-    <meta name="projectKey" content="$repositoryProjectKey">
+    <meta name="projectKey" content="$projectKey">
     <meta name="repositorySlug" content="$repositorySlug">
     <meta name="activeTab" content="pr-harmony-config">
 </head>
 <body>
-<span id="baseUrl" style="display:none">$applicationProperties.getBaseUrl()</span>
-<h1>$i18n.getText("config.header")</h1>
+<input id="baseUrl" type="hidden" value="$applicationProperties.getBaseUrl()"/>
+<input id="projectKey" type="hidden" value="$projectKey"/>
+<input id="repoSlug" type="hidden" value="$repositorySlug"/>
+
+<h1><span class="plugin-logo">&nbsp;</span> $i18n.getText("config.header")</h1>
 
 <hr/>
 
@@ -46,16 +49,16 @@
         <div class="description">$i18n.getText("config.blockedCommits.description")</div>
     </div>
     <div class="field-group">
-        <label for="blockedPRs">$i18n.getText("config.blockedPRs.label")</label>
-        <input class="text config" type="text" id="blockedPRs" name="blockedPRs">
-
-        <div class="description">$i18n.getText("config.blockedPRs.description")</div>
-    </div>
-    <div class="field-group">
         <label for="excludedUsers">$i18n.getText("config.excludedUsers.label")</label>
         <input class="text config" type="text" id="excludedUsers" name="excludedUsers">
 
         <div class="description">$i18n.getText("config.excludedUsers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="blockedPRs">$i18n.getText("config.blockedPRs.label")</label>
+        <input class="text config" type="text" id="blockedPRs" name="blockedPRs">
+
+        <div class="description">$i18n.getText("config.blockedPRs.description")</div>
     </div>
 </form>
 

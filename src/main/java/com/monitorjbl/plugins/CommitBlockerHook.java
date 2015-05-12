@@ -26,14 +26,14 @@ public class CommitBlockerHook implements PreReceiveHook {
 
     UserProfile user = userManager.getRemoteUser();
     for (RefChange ch : collection) {
-      String branch = ch.getRefId().replace("refs/heads/", "");
+      String branch = ch.getRefId().replace(MergeBlocker.REFS_PREFIX, "");
       if (config.getBlockedCommits().contains(branch) && !config.getExcludedUsers().contains(user.getUsername())) {
         hookResponse.err().write("\n" +
                 "******************************\n" +
                 "*    !! Commit Rejected !!   *\n" +
-                "******************************\n\n"+
-                "Direct commits are not allowed\n"+
-                "to branch ["+branch+"].\n\n"
+                "******************************\n\n" +
+                "Direct commits are not allowed\n" +
+                "to branch [" + branch + "].\n\n"
         );
         return false;
       }

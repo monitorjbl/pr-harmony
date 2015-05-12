@@ -20,6 +20,7 @@
 
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
   <component key="mergeBlocker" class="com.monitorjbl.plugins.MergeBlocker"/>
+  <component key="prListener" class="com.monitorjbl.plugins.PullRequestListener"/>
 
   <template-context-item key="applicationPropertiesContextItem" component-ref="applicationProperties"
                          context-key="applicationProperties" name="Application Properties Context Item"/>
@@ -28,6 +29,7 @@
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <resource type="download" name="config.js" location="config.js"/>
     <resource type="download" name="config.css" location="config.css"/>
+    <resource type="download" name="pluginIcon.png" location=""/>
   </web-resource>
 
   <pre-receive-hook key="commitBlocker" name="Commit Blocker" class="com.monitorjbl.plugins.CommitBlockerHook">
