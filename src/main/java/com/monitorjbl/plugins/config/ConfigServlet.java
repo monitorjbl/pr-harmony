@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.net.URI;
 
 public class ConfigServlet extends HttpServlet {
+  public static final String SERVLET_PATH = "/stash/plugins/servlet/pr-harmony/";
   private static final Logger logger = LoggerFactory.getLogger(ConfigServlet.class);
+  
   private final UserManager userManager;
   private final UserService userService;
   private final RepositoryService repoService;
@@ -48,9 +50,21 @@ public class ConfigServlet extends HttpServlet {
       return;
     }
 
-    String[] coords = request.getRequestURI().replace("/stash/plugins/servlet/pr-harmony/", "").split("/");
+    String[] coords = request.getRequestURI().replace(SERVLET_PATH, "").split("/");
+    if (coords.length != 2) {
+      logger.warn("Malformed request path, expecting {}{projectKey}/{repoSlug}", SERVLET_PATH);
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      return;
+    }
+
     StashUser stashUser = userService.findUserByNameOrEmail(user.getUsername());
     Repository repo = repoService.getBySlug(coords[0], coords[1]);
+    if (repo == null) {
+      logger.warn("Project/Repo [{}/{}] not found", coords[0], coords[1]);
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
     if (permissionService.hasRepositoryPermission(stashUser, repo, Permission.REPO_ADMIN)) {
       response.setContentType("text/html;charset=utf-8");
       renderer.render("config.html", ImmutableMap.<String, Object>of(
