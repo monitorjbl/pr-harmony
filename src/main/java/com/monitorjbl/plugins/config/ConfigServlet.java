@@ -24,7 +24,7 @@ import java.net.URI;
 public class ConfigServlet extends HttpServlet {
   public static final String SERVLET_PATH = "/stash/plugins/servlet/pr-harmony/";
   private static final Logger logger = LoggerFactory.getLogger(ConfigServlet.class);
-  
+
   private final UserManager userManager;
   private final UserService userService;
   private final RepositoryService repoService;

@@ -96,10 +96,12 @@ public class ConfigDao {
     String raw = command.call();
 
     List<String> branches = newArrayList();
-    for (String line : raw.split("\n")) {
-      String[] row = line.split("\t");
-      if (row[1].startsWith("refs/heads/")) {
-        branches.add(row[1].replace("refs/heads/", ""));
+    if (raw != null) {
+      for (String line : raw.split("\n")) {
+        String[] row = line.split("\t");
+        if (row[1].startsWith("refs/heads/")) {
+          branches.add(row[1].replace("refs/heads/", ""));
+        }
       }
     }
 
