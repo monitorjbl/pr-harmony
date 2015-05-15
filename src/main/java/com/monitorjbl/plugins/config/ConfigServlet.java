@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 
 public class ConfigServlet extends HttpServlet {
-  public static final String SERVLET_PATH = "/stash/plugins/servlet/pr-harmony/";
+  public static final String SERVLET_PATH = "/plugins/servlet/pr-harmony/";
   private static final Logger logger = LoggerFactory.getLogger(ConfigServlet.class);
 
   private final UserManager userManager;
@@ -47,32 +47,36 @@ public class ConfigServlet extends HttpServlet {
     UserProfile user = userManager.getRemoteUser();
     if (user == null) {
       response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
-      return;
+    } else {
+      handleRequest(request.getRequestURI(), user.getUsername(), response);
     }
+  }
 
-    String[] coords = request.getRequestURI().replace(SERVLET_PATH, "").split("/");
+  void handleRequest(String requestPath, String username, HttpServletResponse response) throws IOException {
+    String[] coords = requestPath.replaceAll(".*" + SERVLET_PATH, "").split("/");
     if (coords.length != 2) {
       logger.warn("Malformed request path, expecting {}{projectKey}/{repoSlug}", SERVLET_PATH);
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
 
-    StashUser stashUser = userService.findUserByNameOrEmail(user.getUsername());
     Repository repo = repoService.getBySlug(coords[0], coords[1]);
     if (repo == null) {
-      logger.warn("Project/Repo [{}/{}] not found", coords[0], coords[1]);
+      logger.warn("Project/Repo [{}/{}] not found for user {}", coords[0], coords[1], username);
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
 
+    StashUser stashUser = userService.getUserBySlug(username);
     if (permissionService.hasRepositoryPermission(stashUser, repo, Permission.REPO_ADMIN)) {
+      response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
       renderer.render("config.html", ImmutableMap.<String, Object>of(
           "projectKey", coords[0],
           "repositorySlug", coords[1]
       ), response.getWriter());
     } else {
-      logger.debug("Permission denied for user [{}]", user.getUsername());
+      logger.debug("Permission denied for user [{}]", username);
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
   }

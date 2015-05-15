@@ -16,7 +16,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.filter;

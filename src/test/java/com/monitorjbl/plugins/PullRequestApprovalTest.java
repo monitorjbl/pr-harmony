@@ -11,9 +11,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Set;
 
-import static com.monitorjbl.plugins.Utils.mockParticipant;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.monitorjbl.plugins.Utils.mockParticipant;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
