@@ -6,7 +6,7 @@
 
   <groupId>com.monitorjbl.plugins</groupId>
   <artifactId>pr-harmony</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <packaging>atlassian-plugin</packaging>
 
   <name>PR Harmony</name>
@@ -124,7 +124,9 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
@@ -138,5 +140,6 @@
     <stash.data.version>3.5.1</stash.data.version>
     <amps.version>5.0.13</amps.version>
     <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
