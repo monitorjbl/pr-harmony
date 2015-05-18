@@ -2,7 +2,9 @@
 
 ![YinYang](/src/main/resources/images/pluginIcon.png?raw=true)
 
-Provides additional pull request workflows for your team. Most teams have processes around how they merge PRs, but there aren't mechanisms in Stash to ensure that no one accidentally merges something they shouldn't. This plugin attempts to address some of these shortcomings.
+Provides additional pull request workflows for your team. Available on the [Atlassian Marketplace](https://marketplace.atlassian.com/plugins/com.monitorjbl.plugins.pr-harmony) now. 
+
+Most teams have processes around how they merge PRs, but there aren't mechanisms in Stash to ensure that no one accidentally merges something they shouldn't. This plugin attempts to address some of these shortcomings.
 
 # Branch Protection
 
