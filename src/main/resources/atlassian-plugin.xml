@@ -45,6 +45,12 @@
     <description>Provides REST resources for the config UI</description>
   </rest>
 
+  <stash-resource key="stash-suggest-reviewers-resources" name="PR Create Hook">
+    <context>stash.page.pullRequest.create</context>
+    <resource type="download" name="pr-create-hook.js" location="pr-create-hook.js"/>
+    <dependency>com.atlassian.stash.stash-web-plugin:global</dependency>
+  </stash-resource>
+
   <web-item key="pr-harmony-config" weight="30"
             section="stash.repository.settings.panel/repository-settings-addons-section">
     <label>PR Harmony</label>

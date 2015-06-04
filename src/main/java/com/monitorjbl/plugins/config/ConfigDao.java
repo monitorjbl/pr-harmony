@@ -7,6 +7,7 @@ import com.atlassian.stash.repository.RepositoryService;
 import com.atlassian.stash.scm.CommandOutputHandler;
 import com.atlassian.stash.scm.git.GitCommand;
 import com.atlassian.stash.scm.git.GitCommandBuilderFactory;
+import com.atlassian.stash.user.StashUser;
 import com.atlassian.stash.user.UserService;
 import com.atlassian.utils.process.ProcessException;
 import com.atlassian.utils.process.StringOutputHandler;
@@ -17,9 +18,12 @@ import com.google.common.base.Splitter;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
+import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 public class ConfigDao {
   public static final String REQUIRED_REVIEWS = "requiredReviews";
@@ -41,6 +45,16 @@ public class ConfigDao {
     this.repoService = repoService;
     this.commandBuilderFactory = commandBuilderFactory;
     this.userService = userService;
+  }
+
+  public List<User> getDefaultAndRequiredUsers(String projectKey, String repoSlug) {
+    Config cfg = getConfigForRepo(projectKey, repoSlug);
+    Set<User> users = newHashSet();
+    for (String u : concat(cfg.getDefaultReviewers(), cfg.getRequiredReviewers())) {
+      StashUser user = userService.getUserBySlug(u);
+      users.add(new User(user.getSlug(), user.getDisplayName()));
+    }
+    return newArrayList(users);
   }
 
   public Config getConfigForRepo(String projectKey, String repoSlug) {
@@ -78,7 +92,7 @@ public class ConfigDao {
   }
 
   String join(Iterable<String> values, Predicate<String> predicate) {
-    return Joiner.on(',').join(filter(values, predicate));
+    return Joiner.on(", ").join(filter(values, predicate));
   }
 
   List<String> split(String value) {
