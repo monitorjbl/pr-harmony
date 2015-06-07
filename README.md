@@ -31,7 +31,7 @@ These options allow more Gerrit-style voting workflows within Stash.
 
 ## History
 
-This plugin is a clean reimplementation of a couple of plugins I did for the Stash instance we use at work. I wanted to clean some pieces of it up after learning more about the Stash plugin API, and I thought that some users might find it useful as well.
+This plugin is a clean reimplementation of a couple of plugins I did for the Stash instance we use at work. I wanted to clean some pieces of it up after learning more about the Stash plugin API, and I thought that some users might find it useful as well. I've also expanded it a bit to do some things we didn't have a direct need for at work but that I think makes life easier on developers/admins alike.
 
 ## Attributions
 
