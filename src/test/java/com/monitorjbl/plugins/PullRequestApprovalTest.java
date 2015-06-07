@@ -191,7 +191,7 @@ public class PullRequestApprovalTest {
   }
 
   @Test
-  public void testGroupRequiredReviewers() throws Exception {
+  public void testGroupRequiredReviewers_mixed() throws Exception {
     Set<PullRequestParticipant> p = newHashSet(
         mockParticipant("user1", true),
         mockParticipant("user2", true),
@@ -209,6 +209,48 @@ public class PullRequestApprovalTest {
 
     assertThat(seen.size(), is(3));
     assertThat(seen, hasItem("user1"));
+    assertThat(seen, hasItem("user2"));
+    assertThat(seen, hasItem("user3"));
+  }
+
+  @Test
+  public void testGroupRequiredReviewers_groupOnly() throws Exception {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user1", true),
+        mockParticipant("user2", true),
+        mockParticipant("user3", true)
+    );
+    when(pr.getReviewers()).thenReturn(p);
+    when(utils.dereferenceGroups(newArrayList("group1"))).thenReturn(newArrayList("user2", "user3"));
+
+    Set<String> seen = new PullRequestApproval(Config.builder()
+        .requiredReviewerGroups(newArrayList("group1"))
+        .requiredReviews(1)
+        .build(),
+        utils).seenReviewers(pr);
+
+    assertThat(seen.size(), is(2));
+    assertThat(seen, hasItem("user2"));
+    assertThat(seen, hasItem("user3"));
+  }
+
+  @Test
+  public void testGroupRequiredReviewers_multipleGroups() throws Exception {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user1", true),
+        mockParticipant("user2", true),
+        mockParticipant("user3", true)
+    );
+    when(pr.getReviewers()).thenReturn(p);
+    when(utils.dereferenceGroups(newArrayList("group1", "group2"))).thenReturn(newArrayList("user2", "user3"));
+
+    Set<String> seen = new PullRequestApproval(Config.builder()
+        .requiredReviewerGroups(newArrayList("group1", "group2"))
+        .requiredReviews(1)
+        .build(),
+        utils).seenReviewers(pr);
+
+    assertThat(seen.size(), is(2));
     assertThat(seen, hasItem("user2"));
     assertThat(seen, hasItem("user3"));
   }
