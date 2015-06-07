@@ -7,24 +7,21 @@ import com.atlassian.stash.repository.RepositoryService;
 import com.atlassian.stash.scm.CommandOutputHandler;
 import com.atlassian.stash.scm.git.GitCommand;
 import com.atlassian.stash.scm.git.GitCommandBuilderFactory;
-import com.atlassian.stash.user.StashUser;
 import com.atlassian.stash.user.UserService;
-import com.atlassian.stash.util.PageRequestImpl;
 import com.atlassian.utils.process.ProcessException;
 import com.atlassian.utils.process.StringOutputHandler;
 import com.atlassian.utils.process.Watchdog;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
-import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 
 public class ConfigDao {
   public static final String REQUIRED_REVIEWS = "requiredReviews";
@@ -92,14 +89,14 @@ public class ConfigDao {
   }
 
   String join(Iterable<String> values, Predicate<String> predicate) {
-    return Joiner.on(", ").join(filter(values, predicate));
+    return Joiner.on(", ").join(transform(filter(values, predicate), toLowerCase));
   }
 
   List<String> split(String value) {
     if ("".equals(value)) {
       return newArrayList();
     } else {
-      return newArrayList(Splitter.on(", ").trimResults().split(value));
+      return newArrayList(transform(Splitter.on(", ").trimResults().split(value), toLowerCase));
     }
   }
 
@@ -121,17 +118,24 @@ public class ConfigDao {
     return branches;
   }
 
+  private static final Function<String, String> toLowerCase = new Function<String, String>() {
+    @Override
+    public String apply(String input) {
+      return input.toLowerCase();
+    }
+  };
+
   class FilterInvalidUsers implements Predicate<String> {
     @Override
     public boolean apply(String username) {
-      return userService.getUserBySlug(username.trim()) != null;
+      return userService.getUserBySlug(username.trim().toLowerCase()) != null;
     }
   }
 
   class FilterInvalidGroups implements Predicate<String> {
     @Override
     public boolean apply(String group) {
-      return userService.existsGroup(group.trim());
+      return userService.existsGroup(group.trim().toLowerCase());
     }
   }
 
