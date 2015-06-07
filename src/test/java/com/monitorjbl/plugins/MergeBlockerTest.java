@@ -6,6 +6,7 @@ import com.atlassian.stash.pull.PullRequestParticipant;
 import com.atlassian.stash.pull.PullRequestRef;
 import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.scm.pull.MergeRequest;
+import com.google.common.collect.Lists;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 import org.junit.Before;
@@ -18,7 +19,8 @@ import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.monitorjbl.plugins.Utils.mockParticipant;
+import static com.monitorjbl.plugins.TestUtils.mockParticipant;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -28,6 +30,8 @@ import static org.mockito.Mockito.when;
 public class MergeBlockerTest {
   @Mock
   private ConfigDao configDao;
+  @Mock
+  private UserUtils utils;
   @InjectMocks
   private MergeBlocker sut;
 
@@ -44,6 +48,7 @@ public class MergeBlockerTest {
 
 
   @Before
+  @SuppressWarnings("unchecked")
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     when(merge.getPullRequest()).thenReturn(pr);
@@ -53,6 +58,7 @@ public class MergeBlockerTest {
     when(repository.getProject()).thenReturn(project);
     when(repository.getSlug()).thenReturn("repo_1");
     when(project.getKey()).thenReturn("PRJ");
+    when(utils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
   }
 
   @Test

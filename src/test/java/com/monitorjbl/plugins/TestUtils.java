@@ -6,7 +6,7 @@ import com.atlassian.stash.user.StashUser;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class Utils {
+public class TestUtils {
 
   public static PullRequestParticipant mockParticipant(String name, boolean approved) {
     PullRequestParticipant p = mock(PullRequestParticipant.class);

@@ -14,9 +14,11 @@ import java.util.Set;
 public class MergeBlocker implements MergeRequestCheck {
   public static final String REFS_PREFIX = "refs/heads/";
   private final ConfigDao configDao;
+  private final UserUtils utils;
 
-  public MergeBlocker(ConfigDao configDao) {
+  public MergeBlocker(ConfigDao configDao, UserUtils utils) {
     this.configDao = configDao;
+    this.utils = utils;
   }
 
   @Override
@@ -29,7 +31,7 @@ public class MergeBlocker implements MergeRequestCheck {
     if (config.getBlockedPRs().contains(branch)) {
       mergeRequest.veto("Pull Request Blocked", "Pull requests have been disabled for branch [" + branch + "]");
     } else {
-      PullRequestApproval approval = new PullRequestApproval(config);
+      PullRequestApproval approval = new PullRequestApproval(config, utils);
       if (!approval.isPullRequestApproved(pr)) {
         Set<String> missing = approval.missingRevieiwers(pr);
         mergeRequest.veto("Required reviewers must approve", (config.getRequiredReviews() - approval.seenReviewers(pr).size()) +

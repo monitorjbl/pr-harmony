@@ -20,16 +20,28 @@
 
 <form id="mergeBlockerConfig" class="aui">
     <div class="field-group">
-        <label for="requiredReviewers">$i18n.getText("config.defaultReviewers.label")</label>
+        <label for="defaultReviewers">$i18n.getText("config.defaultReviewers.label")</label>
         <input class="text config" type="text" id="defaultReviewers" name="defaultReviewers">
 
         <div class="description">$i18n.getText("config.defaultReviewers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="defaultReviewerGroups">$i18n.getText("config.defaultReviewerGroups.label")</label>
+        <input class="text config" type="text" id="defaultReviewerGroups" name="defaultReviewerGroups">
+
+        <div class="description">$i18n.getText("config.defaultReviewerGroups.description")</div>
     </div>
     <div class="field-group">
         <label for="requiredReviewers">$i18n.getText("config.requiredReviewers.label")</label>
         <input class="text config" type="text" id="requiredReviewers" name="requiredReviewers">
 
         <div class="description">$i18n.getText("config.requiredReviewers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="requiredReviewerGroups">$i18n.getText("config.requiredReviewerGroups.label")</label>
+        <input class="text config" type="text" id="requiredReviewerGroups" name="requiredReviewerGroups">
+
+        <div class="description">$i18n.getText("config.requiredReviewerGroups.description")</div>
     </div>
     <div class="field-group">
         <label for="automergePRs">$i18n.getText("config.automergePRs.label")</label>
@@ -59,6 +71,12 @@
         <input class="text config" type="text" id="excludedUsers" name="excludedUsers">
 
         <div class="description">$i18n.getText("config.excludedUsers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="excludedGroups">$i18n.getText("config.excludedGroups.label")</label>
+        <input class="text config" type="text" id="excludedGroups" name="excludedGroups">
+
+        <div class="description">$i18n.getText("config.excludedGroups.description")</div>
     </div>
     <div class="field-group">
         <label for="blockedPRs">$i18n.getText("config.blockedPRs.label")</label>

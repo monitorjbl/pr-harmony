@@ -11,13 +11,13 @@ form.aui input.config.text {
 }
 
 form.aui legend, form.aui .field-group > label {
-    width: 150px;
+    width: 165px;
 }
 
 form.aui .text {
-    margin-left: 20px;
+    margin-left: 35px;
 }
 
 form.aui div.description {
-    margin-left: 20px;
+    margin-left: 60px;
 }

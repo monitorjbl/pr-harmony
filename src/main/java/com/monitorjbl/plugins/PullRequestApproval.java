@@ -8,6 +8,7 @@ import com.monitorjbl.plugins.config.Config;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Maps.uniqueIndex;
 import static com.google.common.collect.Sets.difference;
 import static com.google.common.collect.Sets.newHashSet;
@@ -15,9 +16,11 @@ import static com.google.common.collect.Sets.newHashSet;
 public class PullRequestApproval {
 
   private final Config config;
+  private final UserUtils utils;
 
-  public PullRequestApproval(Config config) {
+  public PullRequestApproval(Config config, UserUtils utils) {
     this.config = config;
+    this.utils = utils;
   }
 
   public boolean isPullRequestApproved(PullRequest pr) {
@@ -27,7 +30,7 @@ public class PullRequestApproval {
   public Set<String> missingRevieiwers(PullRequest pr) {
     Map<String, PullRequestParticipant> map = transformReviewers(pr);
     Set<String> missingReviewers = newHashSet();
-    for (String req : config.getRequiredReviewers()) {
+    for (String req : concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups()))) {
       if (!pr.getAuthor().getUser().getSlug().equals(req) && (!map.containsKey(req) || !map.get(req).isApproved())) {
         missingReviewers.add(req);
       }
@@ -36,7 +39,8 @@ public class PullRequestApproval {
   }
 
   public Set<String> seenReviewers(PullRequest pr) {
-    return difference(newHashSet(config.getRequiredReviewers()), missingRevieiwers(pr));
+    Set<String> required = newHashSet(concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups())));
+    return difference(required, missingRevieiwers(pr));
   }
 
   Map<String, PullRequestParticipant> transformReviewers(PullRequest pr) {

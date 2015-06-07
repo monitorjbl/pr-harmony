@@ -9,6 +9,7 @@ import com.atlassian.stash.scm.git.GitCommand;
 import com.atlassian.stash.scm.git.GitCommandBuilderFactory;
 import com.atlassian.stash.user.StashUser;
 import com.atlassian.stash.user.UserService;
+import com.atlassian.stash.util.PageRequestImpl;
 import com.atlassian.utils.process.ProcessException;
 import com.atlassian.utils.process.StringOutputHandler;
 import com.atlassian.utils.process.Watchdog;
@@ -28,8 +29,11 @@ import static com.google.common.collect.Sets.newHashSet;
 public class ConfigDao {
   public static final String REQUIRED_REVIEWS = "requiredReviews";
   public static final String REQUIRED_REVIWERS = "requiredReviewers";
+  public static final String REQUIRED_REVIWER_GROUPS = "requiredReviewerGroups";
   public static final String DEFAULT_REVIEWERS = "defaultReviewers";
+  public static final String DEFAULT_REVIEWER_GROUPS = "defaultReviewerGroups";
   public static final String EXCLUDED_USERS = "excludedUsers";
+  public static final String EXCLUDED_GROUPS = "excludedGroups";
   public static final String BLOCKED_COMMITS = "blockedCommits";
   public static final String BLOCKED_PRS = "blockedPRs";
   public static final String AUTOMERGE_PRS = "automergePRs";
@@ -47,23 +51,16 @@ public class ConfigDao {
     this.userService = userService;
   }
 
-  public List<User> getDefaultAndRequiredUsers(String projectKey, String repoSlug) {
-    Config cfg = getConfigForRepo(projectKey, repoSlug);
-    Set<User> users = newHashSet();
-    for (String u : concat(cfg.getDefaultReviewers(), cfg.getRequiredReviewers())) {
-      StashUser user = userService.getUserBySlug(u);
-      users.add(new User(user.getSlug(), user.getDisplayName()));
-    }
-    return newArrayList(users);
-  }
-
   public Config getConfigForRepo(String projectKey, String repoSlug) {
     PluginSettings settings = settings(projectKey, repoSlug);
     return Config.builder()
         .requiredReviews(Integer.parseInt(get(settings, REQUIRED_REVIEWS, "0")))
         .requiredReviewers(split(get(settings, REQUIRED_REVIWERS, "")))
+        .requiredReviewerGroups(split(get(settings, REQUIRED_REVIWER_GROUPS, "")))
         .defaultReviewers(split(get(settings, DEFAULT_REVIEWERS, "")))
+        .defaultReviewerGroups(split(get(settings, DEFAULT_REVIEWER_GROUPS, "")))
         .excludedUsers(split(get(settings, EXCLUDED_USERS, "")))
+        .excludedGroups(split(get(settings, EXCLUDED_GROUPS, "")))
         .blockedCommits(split(get(settings, BLOCKED_COMMITS, "")))
         .blockedPRs(split(get(settings, BLOCKED_PRS, "")))
         .automergePRs(split(get(settings, AUTOMERGE_PRS, "")))
@@ -75,8 +72,11 @@ public class ConfigDao {
     PluginSettings settings = settings(projectKey, repoSlug);
     settings.put(REQUIRED_REVIEWS, Integer.toString(config.getRequiredReviews()));
     settings.put(REQUIRED_REVIWERS, join(config.getRequiredReviewers(), new FilterInvalidUsers()));
+    settings.put(REQUIRED_REVIWER_GROUPS, join(config.getRequiredReviewerGroups(), new FilterInvalidGroups()));
     settings.put(DEFAULT_REVIEWERS, join(config.getDefaultReviewers(), new FilterInvalidUsers()));
+    settings.put(DEFAULT_REVIEWER_GROUPS, join(config.getDefaultReviewerGroups(), new FilterInvalidGroups()));
     settings.put(EXCLUDED_USERS, join(config.getExcludedUsers(), new FilterInvalidUsers()));
+    settings.put(EXCLUDED_GROUPS, join(config.getExcludedGroups(), new FilterInvalidGroups()));
     settings.put(BLOCKED_COMMITS, join(config.getBlockedCommits(), branchesFilter));
     settings.put(BLOCKED_PRS, join(config.getBlockedPRs(), branchesFilter));
     settings.put(AUTOMERGE_PRS, join(config.getAutomergePRs(), branchesFilter));
@@ -125,6 +125,13 @@ public class ConfigDao {
     @Override
     public boolean apply(String username) {
       return userService.getUserBySlug(username.trim()) != null;
+    }
+  }
+
+  class FilterInvalidGroups implements Predicate<String> {
+    @Override
+    public boolean apply(String group) {
+      return userService.existsGroup(group.trim());
     }
   }
 

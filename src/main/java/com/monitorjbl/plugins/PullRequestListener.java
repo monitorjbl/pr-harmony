@@ -23,11 +23,13 @@ import static com.google.common.collect.Sets.newHashSet;
 
 public class PullRequestListener {
   private final ConfigDao configDao;
+  private final UserUtils utils;
   private final PullRequestService prService;
   private final SecurityService securityService;
 
-  public PullRequestListener(ConfigDao configDao, PullRequestService prService, SecurityService securityService) {
+  public PullRequestListener(ConfigDao configDao, UserUtils utils, PullRequestService prService, SecurityService securityService) {
     this.configDao = configDao;
+    this.utils = utils;
     this.prService = prService;
     this.securityService = securityService;
   }
@@ -44,7 +46,7 @@ public class PullRequestListener {
       public String apply(PullRequestParticipant input) {
         return input.getUser().getSlug();
       }
-    }), config.getDefaultReviewers()));
+    }), config.getDefaultReviewers(), utils.dereferenceGroups(config.getDefaultReviewerGroups())));
 
     securityService.withPermission(Permission.ADMIN, "Adding default reviewers").call(new Operation<Object, RuntimeException>() {
       public Object perform() throws RuntimeException {

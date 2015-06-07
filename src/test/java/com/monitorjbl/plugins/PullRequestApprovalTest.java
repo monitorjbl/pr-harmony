@@ -13,7 +13,8 @@ import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.monitorjbl.plugins.Utils.mockParticipant;
+import static com.monitorjbl.plugins.TestUtils.mockParticipant;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.when;
 public class PullRequestApprovalTest {
   @Mock
   PullRequest pr;
+  @Mock
+  UserUtils utils;
 
   @Before
   public void before() {
@@ -36,13 +39,13 @@ public class PullRequestApprovalTest {
         mockParticipant("user1", false)
     );
     when(pr.getReviewers()).thenReturn(p);
-    assertThat(new PullRequestApproval(Config.builder().build()).isPullRequestApproved(pr), is(true));
+    assertThat(new PullRequestApproval(Config.builder().build(), utils).isPullRequestApproved(pr), is(true));
   }
 
   @Test
   public void testDefaultConfiguration_noRevieiwers() {
     when(pr.getReviewers()).thenReturn(Sets.<PullRequestParticipant>newHashSet());
-    assertThat(new PullRequestApproval(Config.builder().build()).isPullRequestApproved(pr), is(true));
+    assertThat(new PullRequestApproval(Config.builder().build(), utils).isPullRequestApproved(pr), is(true));
   }
 
   @Test
@@ -54,8 +57,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
-        .build()
-    ).isPullRequestApproved(pr), is(false));
+        .build(),
+        utils).isPullRequestApproved(pr), is(false));
   }
 
   @Test
@@ -67,8 +70,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
-        .build()
-    ).isPullRequestApproved(pr), is(true));
+        .build(),
+        utils).isPullRequestApproved(pr), is(true));
   }
 
   @Test
@@ -79,8 +82,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
-        .build()
-    ).isPullRequestApproved(pr), is(true));
+        .build(),
+        utils).isPullRequestApproved(pr), is(true));
   }
 
   @Test
@@ -93,8 +96,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1", "user2"))
         .requiredReviews(2)
-        .build()
-    ).isPullRequestApproved(pr), is(true));
+        .build(),
+        utils).isPullRequestApproved(pr), is(true));
   }
 
   @Test
@@ -107,8 +110,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1", "user2"))
         .requiredReviews(2)
-        .build()
-    ).isPullRequestApproved(pr), is(false));
+        .build(),
+        utils).isPullRequestApproved(pr), is(false));
   }
 
   @Test
@@ -122,8 +125,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1", "user2"))
         .requiredReviews(2)
-        .build()
-    ).isPullRequestApproved(pr), is(false));
+        .build(),
+        utils).isPullRequestApproved(pr), is(false));
   }
 
   @Test
@@ -135,8 +138,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
-        .build()
-    ).missingRevieiwers(pr).size(), is(1));
+        .build(),
+        utils).missingRevieiwers(pr).size(), is(1));
   }
 
   @Test
@@ -150,8 +153,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1", "user2", "user3"))
         .requiredReviews(1)
-        .build()
-    ).missingRevieiwers(pr).size(), is(2));
+        .build(),
+        utils).missingRevieiwers(pr).size(), is(2));
   }
 
   @Test
@@ -165,8 +168,8 @@ public class PullRequestApprovalTest {
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1", "user2", "user3"))
         .requiredReviews(1)
-        .build()
-    ).missingRevieiwers(pr).size(), is(0));
+        .build(),
+        utils).missingRevieiwers(pr).size(), is(0));
   }
 
   @Test
@@ -181,9 +184,32 @@ public class PullRequestApprovalTest {
     Set<String> seen = new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1", "user2", "user3"))
         .requiredReviews(1)
-        .build()
-    ).seenReviewers(pr);
+        .build(),
+        utils).seenReviewers(pr);
     assertThat(seen.size(), is(2));
     assertThat(seen, contains("user1", "user3"));
+  }
+
+  @Test
+  public void testGroupRequiredReviewers() throws Exception {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user1", true),
+        mockParticipant("user2", true),
+        mockParticipant("user3", true)
+    );
+    when(pr.getReviewers()).thenReturn(p);
+    when(utils.dereferenceGroups(newArrayList("group1"))).thenReturn(newArrayList("user2", "user3"));
+
+    Set<String> seen = new PullRequestApproval(Config.builder()
+        .requiredReviewers(newArrayList("user1"))
+        .requiredReviewerGroups(newArrayList("group1"))
+        .requiredReviews(1)
+        .build(),
+        utils).seenReviewers(pr);
+
+    assertThat(seen.size(), is(3));
+    assertThat(seen, hasItem("user1"));
+    assertThat(seen, hasItem("user2"));
+    assertThat(seen, hasItem("user3"));
   }
 }

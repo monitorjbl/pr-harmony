@@ -14,6 +14,7 @@ import com.atlassian.stash.user.EscalatedSecurityContext;
 import com.atlassian.stash.user.Permission;
 import com.atlassian.stash.user.SecurityService;
 import com.atlassian.stash.util.Operation;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
@@ -28,9 +29,10 @@ import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.monitorjbl.plugins.Utils.mockParticipant;
+import static com.monitorjbl.plugins.TestUtils.mockParticipant;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -45,6 +47,8 @@ public class PullRequestListenerTest {
   private PullRequestService prService;
   @Mock
   private SecurityService securityService;
+  @Mock
+  private UserUtils utils;
   @InjectMocks
   private PullRequestListener sut;
 
@@ -64,6 +68,7 @@ public class PullRequestListenerTest {
   PullRequestMergeability mergeability;
 
   @Before
+  @SuppressWarnings("unchecked")
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     when(securityService.withPermission(any(Permission.class), anyString())).thenReturn(new MockSecurityContext());
@@ -78,6 +83,7 @@ public class PullRequestListenerTest {
     when(repository.getId()).thenReturn(20);
     when(repository.getSlug()).thenReturn("repo_1");
     when(project.getKey()).thenReturn("PRJ");
+    when(utils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
   }
 
   @Test
