@@ -4,6 +4,7 @@ import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
 import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
 import com.atlassian.stash.project.Project;
 import com.atlassian.stash.pull.PullRequest;
+import com.atlassian.stash.pull.PullRequestMergeRequest;
 import com.atlassian.stash.pull.PullRequestMergeability;
 import com.atlassian.stash.pull.PullRequestParticipant;
 import com.atlassian.stash.pull.PullRequestRef;
@@ -90,7 +91,7 @@ public class PullRequestListenerTest {
   public void testAutomerge_defaultConfig() throws Exception {
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder().build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, never()).merge(repository.getId(), pr.getId(), pr.getVersion());
+    verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
   @Test
@@ -100,7 +101,7 @@ public class PullRequestListenerTest {
         .blockedPRs(newArrayList("master"))
         .build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, never()).merge(repository.getId(), pr.getId(), pr.getVersion());
+    verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
   @Test
@@ -113,7 +114,7 @@ public class PullRequestListenerTest {
         .requiredReviews(1)
         .build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, times(1)).merge(repository.getId(), pr.getId(), pr.getVersion());
+    verify(prService, times(1)).merge(any(PullRequestMergeRequest.class));
   }
 
   @Test
@@ -126,7 +127,7 @@ public class PullRequestListenerTest {
         .requiredReviews(1)
         .build());
     sut.automergePullRequest(approvedEvent);
-    verify(prService, never()).merge(repository.getId(), pr.getId(), pr.getVersion());
+    verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
   @Test

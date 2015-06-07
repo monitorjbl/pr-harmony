@@ -4,6 +4,7 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
 import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
 import com.atlassian.stash.pull.PullRequest;
+import com.atlassian.stash.pull.PullRequestMergeRequest;
 import com.atlassian.stash.pull.PullRequestParticipant;
 import com.atlassian.stash.pull.PullRequestRole;
 import com.atlassian.stash.pull.PullRequestService;
@@ -62,14 +63,18 @@ public class PullRequestListener {
 
   @EventListener
   public void automergePullRequest(PullRequestApprovedEvent event) {
-    PullRequest pr = event.getPullRequest();
+    final PullRequest pr = event.getPullRequest();
     Repository repo = pr.getToRef().getRepository();
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
     String branch = pr.getToRef().getId().replaceAll(MergeBlocker.REFS_PREFIX, "");
 
     if (config.getAutomergePRs().contains(branch) && !config.getBlockedPRs().contains(branch) &&
         prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
-      prService.merge(repo.getId(), pr.getId(), pr.getVersion());
+      securityService.withPermission(Permission.ADMIN, "Automerging pull request").call(new Operation<Object, RuntimeException>() {
+        public Object perform() throws RuntimeException {
+          return prService.merge(new PullRequestMergeRequest.Builder(pr).build());
+        }
+      });
     }
   }
 
