@@ -54,8 +54,6 @@ public class PullRequestListenerTest {
   private PullRequestListener sut;
 
   @Mock
-  PullRequestApprovedEvent approvedEvent;
-  @Mock
   PullRequestOpenedEvent openedEvent;
   @Mock
   PullRequest pr;
@@ -73,7 +71,6 @@ public class PullRequestListenerTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     when(securityService.withPermission(any(Permission.class), anyString())).thenReturn(new MockSecurityContext());
-    when(approvedEvent.getPullRequest()).thenReturn(pr);
     when(openedEvent.getPullRequest()).thenReturn(pr);
     when(pr.getToRef()).thenReturn(ref);
     when(pr.getId()).thenReturn(10L);
@@ -90,7 +87,7 @@ public class PullRequestListenerTest {
   @Test
   public void testAutomerge_defaultConfig() throws Exception {
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder().build());
-    sut.automergePullRequest(approvedEvent);
+    sut.automergePullRequest(pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
@@ -100,7 +97,7 @@ public class PullRequestListenerTest {
         .automergePRs(newArrayList("master"))
         .blockedPRs(newArrayList("master"))
         .build());
-    sut.automergePullRequest(approvedEvent);
+    sut.automergePullRequest(pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
@@ -113,7 +110,7 @@ public class PullRequestListenerTest {
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
         .build());
-    sut.automergePullRequest(approvedEvent);
+    sut.automergePullRequest(pr);
     verify(prService, times(1)).merge(any(PullRequestMergeRequest.class));
   }
 
@@ -126,7 +123,7 @@ public class PullRequestListenerTest {
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
         .build());
-    sut.automergePullRequest(approvedEvent);
+    sut.automergePullRequest(pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
