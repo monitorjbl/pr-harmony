@@ -1,7 +1,7 @@
 (function ($) {
     var baseUrl, projectKey, repoSlug;
 
-
+console.log("asdfasfasdfasdf");
     function saveConfig() {
         $.ajax({
             url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + repoSlug,
@@ -17,7 +17,8 @@
                 excludedGroups: $('#excludedGroups').val().split(','),
                 blockedCommits: $('#blockedCommits').val().split(','),
                 blockedPRs: $('#blockedPRs').val().split(','),
-                automergePRs: $('#automergePRs').val().split(',')
+                automergePRs: $('#automergePRs').val().split(','),
+                automergePRsFrom: $('#automergePRsFrom').val().split(',')
             }),
             success: function (config) {
                 location.reload();
@@ -40,6 +41,7 @@
                 $('#blockedCommits').val(config.blockedCommits);
                 $('#blockedPRs').val(config.blockedPRs);
                 $('#automergePRs').val(config.automergePRs);
+                $('#automergePRsFrom').val(config.automergePRsFrom);
             }
         });
     }

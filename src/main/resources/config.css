@@ -1,5 +1,5 @@
 form.aui input.config.text {
-    max-width: 500px;
+    max-width: 525px;
 }
 
 .plugin-logo {
@@ -11,7 +11,7 @@ form.aui input.config.text {
 }
 
 form.aui legend, form.aui .field-group > label {
-    width: 165px;
+    width: 200px;
 }
 
 form.aui .text {
@@ -19,5 +19,6 @@ form.aui .text {
 }
 
 form.aui div.description {
-    margin-left: 60px;
+    margin-left: 95px;
+    max-width: 510px;
 }

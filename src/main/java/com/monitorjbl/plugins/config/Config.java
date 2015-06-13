@@ -18,6 +18,7 @@ public class Config {
   private List<String> blockedCommits = newArrayList();
   private List<String> blockedPRs = newArrayList();
   private List<String> automergePRs = newArrayList();
+  private List<String> automergePRsFrom = newArrayList();
   private List<String> excludedUsers = newArrayList();
   private List<String> excludedGroups = newArrayList();
 
@@ -33,6 +34,7 @@ public class Config {
     setBlockedCommits(builder.blockedCommits);
     setBlockedPRs(builder.blockedPRs);
     setAutomergePRs(builder.automergePRs);
+    setAutomergePRsFrom(builder.automergePRsFrom);
     setExcludedUsers(builder.excludedUsers);
     setExcludedGroups(builder.excludedGroups);
   }
@@ -101,6 +103,14 @@ public class Config {
     this.automergePRs = automergePRs;
   }
 
+  public List<String> getAutomergePRsFrom() {
+    return automergePRsFrom;
+  }
+
+  public void setAutomergePRsFrom(List<String> automergePRsFrom) {
+    this.automergePRsFrom = automergePRsFrom;
+  }
+
   public List<String> getExcludedUsers() {
     return excludedUsers;
   }
@@ -134,6 +144,7 @@ public class Config {
     private List<String> blockedCommits = newArrayList();
     private List<String> blockedPRs = newArrayList();
     private List<String> automergePRs = newArrayList();
+    private List<String> automergePRsFrom = newArrayList();
     private List<String> excludedUsers = newArrayList();
     private List<String> excludedGroups = newArrayList();
 
@@ -149,6 +160,7 @@ public class Config {
       blockedCommits = newArrayList(copy.blockedCommits);
       blockedPRs = newArrayList(copy.blockedPRs);
       automergePRs = newArrayList(copy.automergePRs);
+      automergePRsFrom = newArrayList(copy.automergePRsFrom);
       excludedUsers = newArrayList(copy.excludedUsers);
       excludedGroups = newArrayList(copy.excludedGroups);
     }
@@ -190,6 +202,11 @@ public class Config {
 
     public Builder automergePRs(List<String> automergePRs) {
       this.automergePRs = automergePRs;
+      return this;
+    }
+
+    public Builder automergePRsFrom(List<String> automergePRsFrom) {
+      this.automergePRsFrom = automergePRsFrom;
       return this;
     }
 

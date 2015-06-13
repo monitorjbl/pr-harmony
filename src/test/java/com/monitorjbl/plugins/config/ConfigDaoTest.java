@@ -1,8 +1,6 @@
 package com.monitorjbl.plugins.config;
 
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.stash.repository.RepositoryService;
-import com.atlassian.stash.scm.git.GitCommandBuilderFactory;
 import com.atlassian.stash.user.UserService;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -23,10 +21,6 @@ import static org.junit.Assert.assertThat;
 public class ConfigDaoTest {
   @Mock
   private PluginSettingsFactory pluginSettingsFactory;
-  @Mock
-  private RepositoryService repoService;
-  @Mock
-  private GitCommandBuilderFactory commandBuilderFactory;
   @Mock
   private UserService userService;
   @InjectMocks

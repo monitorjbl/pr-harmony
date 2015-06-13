@@ -87,10 +87,11 @@ public class PullRequestListener {
   void automergePullRequest(final PullRequest pr) {
     Repository repo = pr.getToRef().getRepository();
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
-    String branch = regexUtils.formatBranchName(pr.getToRef().getId());
+    String toBranch = regexUtils.formatBranchName(pr.getToRef().getId());
+    String fromBranch = regexUtils.formatBranchName(pr.getFromRef().getId());
 
-    if (regexUtils.match(config.getAutomergePRs(), branch) && !regexUtils.match(config.getBlockedPRs(), branch) &&
-        prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
+    if ((regexUtils.match(config.getAutomergePRs(), toBranch) || regexUtils.match(config.getAutomergePRsFrom(), fromBranch)) &&
+        !regexUtils.match(config.getBlockedPRs(), toBranch) && prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
       securityService.withPermission(Permission.ADMIN, "Automerging pull request").call(new Operation<Object, RuntimeException>() {
         public Object perform() throws RuntimeException {
           return prService.merge(new PullRequestMergeRequest.Builder(pr).build());

@@ -2,20 +2,11 @@ package com.monitorjbl.plugins.config;
 
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.repository.RepositoryService;
-import com.atlassian.stash.scm.CommandOutputHandler;
-import com.atlassian.stash.scm.git.GitCommand;
-import com.atlassian.stash.scm.git.GitCommandBuilderFactory;
 import com.atlassian.stash.user.UserService;
-import com.atlassian.utils.process.ProcessException;
-import com.atlassian.utils.process.StringOutputHandler;
-import com.atlassian.utils.process.Watchdog;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 
-import java.io.InputStream;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.filter;
@@ -32,18 +23,14 @@ public class ConfigDao {
   public static final String BLOCKED_COMMITS = "blockedCommits";
   public static final String BLOCKED_PRS = "blockedPRs";
   public static final String AUTOMERGE_PRS = "automergePRs";
+  public static final String AUTOMERGE_PRS_FROM = "automergePRsFrom";
 
   private final PluginSettingsFactory pluginSettingsFactory;
-  private final RepositoryService repoService;
-  private final GitCommandBuilderFactory commandBuilderFactory;
   private final UserService userService;
   private final Predicate noOpFilter = new NoOpFilter();
 
-  public ConfigDao(PluginSettingsFactory pluginSettingsFactory, RepositoryService repoService,
-                   GitCommandBuilderFactory commandBuilderFactory, UserService userService) {
+  public ConfigDao(PluginSettingsFactory pluginSettingsFactory, UserService userService) {
     this.pluginSettingsFactory = pluginSettingsFactory;
-    this.repoService = repoService;
-    this.commandBuilderFactory = commandBuilderFactory;
     this.userService = userService;
   }
 
@@ -60,6 +47,7 @@ public class ConfigDao {
         .blockedCommits(split(get(settings, BLOCKED_COMMITS, "")))
         .blockedPRs(split(get(settings, BLOCKED_PRS, "")))
         .automergePRs(split(get(settings, AUTOMERGE_PRS, "")))
+        .automergePRsFrom(split(get(settings, AUTOMERGE_PRS_FROM, "")))
         .build();
   }
 
@@ -76,6 +64,7 @@ public class ConfigDao {
     settings.put(BLOCKED_COMMITS, join(config.getBlockedCommits(), noOpFilter));
     settings.put(BLOCKED_PRS, join(config.getBlockedPRs(), noOpFilter));
     settings.put(AUTOMERGE_PRS, join(config.getAutomergePRs(), noOpFilter));
+    settings.put(AUTOMERGE_PRS_FROM, join(config.getAutomergePRsFrom(), noOpFilter));
   }
 
   PluginSettings settings(String projectKey, String repoSlug) {
@@ -99,24 +88,6 @@ public class ConfigDao {
     }
   }
 
-  List<String> getBranches(String projectKey, String repoSlug) {
-    Repository repo = repoService.getBySlug(projectKey, repoSlug);
-    GitCommand<String> command = commandBuilderFactory.builder(repo).forEachRef().format("").build(new GitCommandHandler());
-    String raw = command.call();
-
-    List<String> branches = newArrayList();
-    if (raw != null) {
-      for (String line : raw.split("\n")) {
-        String[] row = line.split("\t");
-        if (row[1].startsWith("refs/heads/")) {
-          branches.add(row[1].replace("refs/heads/", ""));
-        }
-      }
-    }
-
-    return branches;
-  }
-
   class NoOpFilter implements Predicate {
     @Override
     public boolean apply(Object input) {
@@ -135,47 +106,6 @@ public class ConfigDao {
     @Override
     public boolean apply(String group) {
       return userService.existsGroup(group.trim().toLowerCase());
-    }
-  }
-
-  class FilterInvalidBranches implements Predicate<String> {
-    private final List<String> branches;
-
-    public FilterInvalidBranches(List<String> branches) {
-      this.branches = branches;
-    }
-
-    @Override
-    public boolean apply(String refspec) {
-      return branches.contains(refspec);
-    }
-  }
-
-  static class GitCommandHandler implements CommandOutputHandler<String> {
-    private final StringOutputHandler outputHandler = new StringOutputHandler();
-
-    @Override
-    public String getOutput() {
-      String output = outputHandler.getOutput();
-      if (output != null && output.trim().isEmpty()) {
-        output = null;
-      }
-      return output;
-    }
-
-    @Override
-    public void process(final InputStream output) throws ProcessException {
-      outputHandler.process(output);
-    }
-
-    @Override
-    public void complete() throws ProcessException {
-      outputHandler.complete();
-    }
-
-    @Override
-    public void setWatchdog(final Watchdog watchdog) {
-      outputHandler.setWatchdog(watchdog);
     }
   }
 

@@ -60,11 +60,15 @@ public class PullRequestListenerTest {
   @Mock
   PullRequest pr;
   @Mock
-  Repository repository;
+  Repository toRepo;
+  @Mock
+  Repository fromRepo;
   @Mock
   Project project;
   @Mock
-  PullRequestRef ref;
+  PullRequestRef toRef;
+  @Mock
+  PullRequestRef fromRef;
   @Mock
   PullRequestMergeability mergeability;
 
@@ -73,14 +77,20 @@ public class PullRequestListenerTest {
     MockitoAnnotations.initMocks(this);
     when(securityService.withPermission(any(Permission.class), anyString())).thenReturn(new MockSecurityContext());
     when(openedEvent.getPullRequest()).thenReturn(pr);
-    when(pr.getToRef()).thenReturn(ref);
+    when(pr.getToRef()).thenReturn(toRef);
+    when(pr.getFromRef()).thenReturn(fromRef);
     when(pr.getId()).thenReturn(10L);
     when(pr.getVersion()).thenReturn(10384);
-    when(ref.getRepository()).thenReturn(repository);
-    when(ref.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
-    when(repository.getProject()).thenReturn(project);
-    when(repository.getId()).thenReturn(20);
-    when(repository.getSlug()).thenReturn("repo_1");
+    when(toRef.getRepository()).thenReturn(toRepo);
+    when(toRef.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
+    when(fromRef.getRepository()).thenReturn(fromRepo);
+    when(fromRef.getId()).thenReturn(RegexUtils.REFS_PREFIX + "otherMaster");
+    when(toRepo.getProject()).thenReturn(project);
+    when(toRepo.getId()).thenReturn(20);
+    when(toRepo.getSlug()).thenReturn("repo_1");
+    when(fromRepo.getProject()).thenReturn(project);
+    when(fromRepo.getId()).thenReturn(30);
+    when(fromRepo.getSlug()).thenReturn("repo_2");
     when(project.getKey()).thenReturn("PRJ");
     when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
     when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
@@ -89,14 +99,14 @@ public class PullRequestListenerTest {
 
   @Test
   public void testAutomerge_defaultConfig() throws Exception {
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder().build());
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder().build());
     sut.automergePullRequest(pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
   @Test
   public void testAutomerge_blockedBranches() throws Exception {
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
         .automergePRs(newArrayList("master"))
         .blockedPRs(newArrayList("master"))
         .build());
@@ -107,8 +117,8 @@ public class PullRequestListenerTest {
   @Test
   public void testAutomerge_canMerge() throws Exception {
     when(mergeability.canMerge()).thenReturn(true);
-    when(prService.canMerge(repository.getId(), pr.getId())).thenReturn(mergeability);
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+    when(prService.canMerge(toRepo.getId(), pr.getId())).thenReturn(mergeability);
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
         .automergePRs(newArrayList("master"))
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
@@ -120,8 +130,8 @@ public class PullRequestListenerTest {
   @Test
   public void testAutomerge_cannotMerge() throws Exception {
     when(mergeability.canMerge()).thenReturn(false);
-    when(prService.canMerge(repository.getId(), pr.getId())).thenReturn(mergeability);
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+    when(prService.canMerge(toRepo.getId(), pr.getId())).thenReturn(mergeability);
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
         .automergePRs(newArrayList("master"))
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
@@ -138,11 +148,11 @@ public class PullRequestListenerTest {
     PullRequestParticipant author = mockParticipant("author", false);
     when(pr.getReviewers()).thenReturn(p);
     when(pr.getAuthor()).thenReturn(author);
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder().build());
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder().build());
     sut.populateDefaultReviewers(openedEvent);
 
     verify(prService, times(1)).assignRole(anyInt(), anyLong(), anyString(), any(PullRequestRole.class));
-    verify(prService, times(1)).assignRole(repository.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
+    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
   }
 
   @Test
@@ -150,14 +160,14 @@ public class PullRequestListenerTest {
     PullRequestParticipant author = mockParticipant("author", false);
     when(pr.getReviewers()).thenReturn(Sets.<PullRequestParticipant>newHashSet());
     when(pr.getAuthor()).thenReturn(author);
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
         .defaultReviewers(newArrayList("user1", "user2"))
         .build());
     sut.populateDefaultReviewers(openedEvent);
 
     verify(prService, times(2)).assignRole(anyInt(), anyLong(), anyString(), any(PullRequestRole.class));
-    verify(prService, times(1)).assignRole(repository.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
-    verify(prService, times(1)).assignRole(repository.getId(), pr.getId(), "user2", PullRequestRole.REVIEWER);
+    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
+    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user2", PullRequestRole.REVIEWER);
   }
 
   @Test
@@ -168,15 +178,15 @@ public class PullRequestListenerTest {
     PullRequestParticipant author = mockParticipant("author", false);
     when(pr.getReviewers()).thenReturn(p);
     when(pr.getAuthor()).thenReturn(author);
-    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
         .defaultReviewers(newArrayList("user2", "user3"))
         .build());
     sut.populateDefaultReviewers(openedEvent);
 
     verify(prService, times(3)).assignRole(anyInt(), anyLong(), anyString(), any(PullRequestRole.class));
-    verify(prService, times(1)).assignRole(repository.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
-    verify(prService, times(1)).assignRole(repository.getId(), pr.getId(), "user2", PullRequestRole.REVIEWER);
-    verify(prService, times(1)).assignRole(repository.getId(), pr.getId(), "user3", PullRequestRole.REVIEWER);
+    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
+    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user2", PullRequestRole.REVIEWER);
+    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user3", PullRequestRole.REVIEWER);
   }
 
   static class MockSecurityContext implements EscalatedSecurityContext {
