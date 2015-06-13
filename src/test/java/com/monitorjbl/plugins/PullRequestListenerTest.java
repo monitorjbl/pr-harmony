@@ -40,6 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 public class PullRequestListenerTest {
   @Mock
   private ConfigDao configDao;
@@ -48,7 +49,9 @@ public class PullRequestListenerTest {
   @Mock
   private SecurityService securityService;
   @Mock
-  private UserUtils utils;
+  private UserUtils userUtils;
+  @Mock
+  private RegexUtils regexUtils;
   @InjectMocks
   private PullRequestListener sut;
 
@@ -66,7 +69,6 @@ public class PullRequestListenerTest {
   PullRequestMergeability mergeability;
 
   @Before
-  @SuppressWarnings("unchecked")
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     when(securityService.withPermission(any(Permission.class), anyString())).thenReturn(new MockSecurityContext());
@@ -75,12 +77,14 @@ public class PullRequestListenerTest {
     when(pr.getId()).thenReturn(10L);
     when(pr.getVersion()).thenReturn(10384);
     when(ref.getRepository()).thenReturn(repository);
-    when(ref.getId()).thenReturn(MergeBlocker.REFS_PREFIX + "master");
+    when(ref.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(repository.getProject()).thenReturn(project);
     when(repository.getId()).thenReturn(20);
     when(repository.getSlug()).thenReturn("repo_1");
     when(project.getKey()).thenReturn("PRJ");
-    when(utils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
+    when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
+    when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
+    when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
   }
 
   @Test

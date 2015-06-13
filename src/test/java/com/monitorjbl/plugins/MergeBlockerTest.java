@@ -31,7 +31,9 @@ public class MergeBlockerTest {
   @Mock
   private ConfigDao configDao;
   @Mock
-  private UserUtils utils;
+  private UserUtils userUtils;
+  @Mock
+  private RegexUtils regexUtils;
   @InjectMocks
   private MergeBlocker sut;
 
@@ -54,11 +56,13 @@ public class MergeBlockerTest {
     when(merge.getPullRequest()).thenReturn(pr);
     when(pr.getToRef()).thenReturn(ref);
     when(ref.getRepository()).thenReturn(repository);
-    when(ref.getId()).thenReturn(MergeBlocker.REFS_PREFIX + "master");
+    when(ref.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(repository.getProject()).thenReturn(project);
     when(repository.getSlug()).thenReturn("repo_1");
     when(project.getKey()).thenReturn("PRJ");
-    when(utils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
+    when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
+    when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
+    when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
   }
 
   @Test

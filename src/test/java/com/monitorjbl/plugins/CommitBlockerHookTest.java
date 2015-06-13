@@ -19,17 +19,21 @@ import java.io.PrintWriter;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 public class CommitBlockerHookTest {
   @Mock
   private ConfigDao configDao;
   @Mock
   private UserManager userManager;
+  @Mock
+  private RegexUtils regexUtils;
   @InjectMocks
   private CommitBlockerHook sut;
 
@@ -55,6 +59,8 @@ public class CommitBlockerHookTest {
     when(project.getKey()).thenReturn("PRJ");
     when(userManager.getRemoteUser()).thenReturn(user);
     when(user.getUsername()).thenReturn("user1");
+    when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
+    when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
   }
 
   @Test
@@ -69,7 +75,7 @@ public class CommitBlockerHookTest {
 
   @Test
   public void testCommit_blockedWithExcludedUser() throws Exception {
-    when(change.getRefId()).thenReturn(MergeBlocker.REFS_PREFIX + "master");
+    when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedCommits(newArrayList("master"))
         .excludedUsers(newArrayList("user1"))
@@ -80,7 +86,7 @@ public class CommitBlockerHookTest {
 
   @Test
   public void testCommit_notBlocked() throws Exception {
-    when(change.getRefId()).thenReturn(MergeBlocker.REFS_PREFIX + "master");
+    when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedCommits(newArrayList("bugfix"))
         .build());

@@ -12,13 +12,14 @@ import javax.annotation.Nonnull;
 import java.util.Set;
 
 public class MergeBlocker implements MergeRequestCheck {
-  public static final String REFS_PREFIX = "refs/heads/";
   private final ConfigDao configDao;
-  private final UserUtils utils;
+  private final UserUtils userUtils;
+  private final RegexUtils regexUtils;
 
-  public MergeBlocker(ConfigDao configDao, UserUtils utils) {
+  public MergeBlocker(ConfigDao configDao, UserUtils userUtils, RegexUtils regexUtils) {
     this.configDao = configDao;
-    this.utils = utils;
+    this.userUtils = userUtils;
+    this.regexUtils = regexUtils;
   }
 
   @Override
@@ -27,11 +28,11 @@ public class MergeBlocker implements MergeRequestCheck {
     Repository repo = pr.getToRef().getRepository();
     final Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
 
-    String branch = pr.getToRef().getId().replace(REFS_PREFIX, "");
-    if (config.getBlockedPRs().contains(branch)) {
+    String branch = regexUtils.formatBranchName(pr.getToRef().getId());
+    if (regexUtils.match(config.getBlockedPRs(), branch)) {
       mergeRequest.veto("Pull Request Blocked", "Pull requests have been disabled for branch [" + branch + "]");
     } else {
-      PullRequestApproval approval = new PullRequestApproval(config, utils);
+      PullRequestApproval approval = new PullRequestApproval(config, userUtils);
       if (!approval.isPullRequestApproved(pr)) {
         Set<String> missing = approval.missingRevieiwers(pr);
         mergeRequest.veto("Required reviewers must approve", (config.getRequiredReviews() - approval.seenReviewers(pr).size()) +

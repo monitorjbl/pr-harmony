@@ -35,12 +35,14 @@ public class PullRequestListener {
   private final UserUtils utils;
   private final PullRequestService prService;
   private final SecurityService securityService;
+  private final RegexUtils regexUtils;
 
-  public PullRequestListener(ConfigDao configDao, UserUtils utils, PullRequestService prService, SecurityService securityService) {
+  public PullRequestListener(ConfigDao configDao, UserUtils utils, PullRequestService prService, SecurityService securityService, RegexUtils regexUtils) {
     this.configDao = configDao;
     this.utils = utils;
     this.prService = prService;
     this.securityService = securityService;
+    this.regexUtils = regexUtils;
   }
 
   @EventListener
@@ -85,9 +87,9 @@ public class PullRequestListener {
   void automergePullRequest(final PullRequest pr) {
     Repository repo = pr.getToRef().getRepository();
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
-    String branch = pr.getToRef().getId().replaceAll(MergeBlocker.REFS_PREFIX, "");
+    String branch = regexUtils.formatBranchName(pr.getToRef().getId());
 
-    if (config.getAutomergePRs().contains(branch) && !config.getBlockedPRs().contains(branch) &&
+    if (regexUtils.match(config.getAutomergePRs(), branch) && !regexUtils.match(config.getBlockedPRs(), branch) &&
         prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
       securityService.withPermission(Permission.ADMIN, "Automerging pull request").call(new Operation<Object, RuntimeException>() {
         public Object perform() throws RuntimeException {

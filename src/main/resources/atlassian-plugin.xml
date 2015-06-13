@@ -21,6 +21,7 @@
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
   <component key="mergeBlocker" class="com.monitorjbl.plugins.MergeBlocker"/>
   <component key="prListener" class="com.monitorjbl.plugins.PullRequestListener"/>
+  <component key="regexUtils" class="com.monitorjbl.plugins.RegexUtils"/>
   <component key="userUtils" class="com.monitorjbl.plugins.UserUtils"/>
 
   <template-context-item key="applicationPropertiesContextItem" component-ref="applicationProperties"

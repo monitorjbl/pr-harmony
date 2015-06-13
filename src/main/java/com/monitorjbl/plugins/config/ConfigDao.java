@@ -11,7 +11,6 @@ import com.atlassian.stash.user.UserService;
 import com.atlassian.utils.process.ProcessException;
 import com.atlassian.utils.process.StringOutputHandler;
 import com.atlassian.utils.process.Watchdog;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -38,6 +37,7 @@ public class ConfigDao {
   private final RepositoryService repoService;
   private final GitCommandBuilderFactory commandBuilderFactory;
   private final UserService userService;
+  private final Predicate noOpFilter = new NoOpFilter();
 
   public ConfigDao(PluginSettingsFactory pluginSettingsFactory, RepositoryService repoService,
                    GitCommandBuilderFactory commandBuilderFactory, UserService userService) {
@@ -63,8 +63,8 @@ public class ConfigDao {
         .build();
   }
 
+  @SuppressWarnings("unchecked")
   public void setConfigForRepo(String projectKey, String repoSlug, Config config) {
-    Predicate<String> branchesFilter = new FilterInvalidBranches(getBranches(projectKey, repoSlug));
     PluginSettings settings = settings(projectKey, repoSlug);
     settings.put(REQUIRED_REVIEWS, Integer.toString(config.getRequiredReviews()));
     settings.put(REQUIRED_REVIWERS, join(config.getRequiredReviewers(), new FilterInvalidUsers()));
@@ -73,9 +73,9 @@ public class ConfigDao {
     settings.put(DEFAULT_REVIEWER_GROUPS, join(config.getDefaultReviewerGroups(), new FilterInvalidGroups()));
     settings.put(EXCLUDED_USERS, join(config.getExcludedUsers(), new FilterInvalidUsers()));
     settings.put(EXCLUDED_GROUPS, join(config.getExcludedGroups(), new FilterInvalidGroups()));
-    settings.put(BLOCKED_COMMITS, join(config.getBlockedCommits(), branchesFilter));
-    settings.put(BLOCKED_PRS, join(config.getBlockedPRs(), branchesFilter));
-    settings.put(AUTOMERGE_PRS, join(config.getAutomergePRs(), branchesFilter));
+    settings.put(BLOCKED_COMMITS, join(config.getBlockedCommits(), noOpFilter));
+    settings.put(BLOCKED_PRS, join(config.getBlockedPRs(), noOpFilter));
+    settings.put(AUTOMERGE_PRS, join(config.getAutomergePRs(), noOpFilter));
   }
 
   PluginSettings settings(String projectKey, String repoSlug) {
@@ -115,6 +115,13 @@ public class ConfigDao {
     }
 
     return branches;
+  }
+
+  class NoOpFilter implements Predicate {
+    @Override
+    public boolean apply(Object input) {
+      return true;
+    }
   }
 
   class FilterInvalidUsers implements Predicate<String> {

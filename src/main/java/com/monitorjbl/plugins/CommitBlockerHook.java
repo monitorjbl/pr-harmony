@@ -14,10 +14,12 @@ import java.util.Collection;
 public class CommitBlockerHook implements PreReceiveHook {
   private final ConfigDao configDao;
   private final UserManager userManager;
+  private final RegexUtils regexUtils;
 
-  public CommitBlockerHook(ConfigDao configDao, UserManager userManager) {
+  public CommitBlockerHook(ConfigDao configDao, UserManager userManager, RegexUtils regexUtils) {
     this.configDao = configDao;
     this.userManager = userManager;
+    this.regexUtils = regexUtils;
   }
 
   @Override
@@ -26,8 +28,8 @@ public class CommitBlockerHook implements PreReceiveHook {
 
     UserProfile user = userManager.getRemoteUser();
     for (RefChange ch : collection) {
-      String branch = ch.getRefId().replace(MergeBlocker.REFS_PREFIX, "");
-      if (config.getBlockedCommits().contains(branch) && !config.getExcludedUsers().contains(user.getUsername())) {
+      String branch = regexUtils.formatBranchName(ch.getRefId());
+      if (regexUtils.match(config.getBlockedCommits(), branch) && !config.getExcludedUsers().contains(user.getUsername())) {
         hookResponse.err().write("\n" +
                 "******************************\n" +
                 "*    !! Commit Rejected !!   *\n" +
