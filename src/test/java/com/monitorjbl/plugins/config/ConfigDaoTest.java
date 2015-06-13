@@ -45,15 +45,15 @@ public class ConfigDaoTest {
   }
 
   @Test
-  public void testJoin_lowercasing() throws Exception {
+  public void testJoin() throws Exception {
     String val = sut.join(newArrayList("UseR1", "user2", "USER3"), noopPredicate);
-    assertThat(val, equalTo("user1, user2, user3"));
+    assertThat(val, equalTo("UseR1, user2, USER3"));
   }
 
   @Test
-  public void testSplit_lowercasing() throws Exception {
+  public void testSplit() throws Exception {
     List<String> str = sut.split("usER1, user2, USER3");
-    assertThat(str, CoreMatchers.<List<String>>equalTo(newArrayList("user1", "user2", "user3")));
+    assertThat(str, CoreMatchers.<List<String>>equalTo(newArrayList("usER1", "user2", "USER3")));
   }
 
   @Test

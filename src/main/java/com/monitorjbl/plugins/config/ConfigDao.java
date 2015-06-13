@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 public class ConfigDao {
@@ -89,14 +88,14 @@ public class ConfigDao {
   }
 
   String join(Iterable<String> values, Predicate<String> predicate) {
-    return Joiner.on(", ").join(transform(filter(values, predicate), toLowerCase));
+    return Joiner.on(", ").join(filter(values, predicate));
   }
 
   List<String> split(String value) {
     if ("".equals(value)) {
       return newArrayList();
     } else {
-      return newArrayList(transform(Splitter.on(", ").trimResults().split(value), toLowerCase));
+      return newArrayList(Splitter.on(", ").trimResults().split(value));
     }
   }
 
@@ -117,13 +116,6 @@ public class ConfigDao {
 
     return branches;
   }
-
-  private static final Function<String, String> toLowerCase = new Function<String, String>() {
-    @Override
-    public String apply(String input) {
-      return input.toLowerCase();
-    }
-  };
 
   class FilterInvalidUsers implements Predicate<String> {
     @Override

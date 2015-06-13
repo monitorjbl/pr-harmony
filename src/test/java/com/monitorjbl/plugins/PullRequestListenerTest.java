@@ -1,6 +1,5 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
 import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
 import com.atlassian.stash.project.Project;
 import com.atlassian.stash.pull.PullRequest;
