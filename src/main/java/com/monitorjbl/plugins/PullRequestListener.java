@@ -1,17 +1,23 @@
 package com.monitorjbl.plugins;
 
 import com.atlassian.event.api.EventListener;
+import com.atlassian.stash.build.BuildStatusSetEvent;
+import com.atlassian.stash.commit.Commit;
 import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
 import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
 import com.atlassian.stash.pull.PullRequest;
 import com.atlassian.stash.pull.PullRequestMergeRequest;
 import com.atlassian.stash.pull.PullRequestParticipant;
 import com.atlassian.stash.pull.PullRequestRole;
+import com.atlassian.stash.pull.PullRequestSearchRequest;
 import com.atlassian.stash.pull.PullRequestService;
+import com.atlassian.stash.pull.PullRequestState;
 import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.user.Permission;
 import com.atlassian.stash.user.SecurityService;
 import com.atlassian.stash.util.Operation;
+import com.atlassian.stash.util.Page;
+import com.atlassian.stash.util.PageRequestImpl;
 import com.google.common.base.Function;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
@@ -23,6 +29,8 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Sets.newHashSet;
 
 public class PullRequestListener {
+  public static final int MAX_COMMITS = 1048576;
+
   private final ConfigDao configDao;
   private final UserUtils utils;
   private final PullRequestService prService;
@@ -62,8 +70,19 @@ public class PullRequestListener {
   }
 
   @EventListener
-  public void automergePullRequest(PullRequestApprovedEvent event) {
-    final PullRequest pr = event.getPullRequest();
+  public void prApprovalListener(PullRequestApprovedEvent event) {
+    automergePullRequest(event.getPullRequest());
+  }
+
+  @EventListener
+  public void buildStatusListener(BuildStatusSetEvent event) {
+    PullRequest pr = findPRByCommitId(event.getCommitId());
+    if (pr != null) {
+      automergePullRequest(pr);
+    }
+  }
+
+  void automergePullRequest(final PullRequest pr) {
     Repository repo = pr.getToRef().getRepository();
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
     String branch = pr.getToRef().getId().replaceAll(MergeBlocker.REFS_PREFIX, "");
@@ -78,4 +97,23 @@ public class PullRequestListener {
     }
   }
 
+  PullRequest findPRByCommitId(String commitId) {
+    int start = 0;
+    Page<PullRequest> requests = null;
+    while (requests == null || requests.getSize() > 0) {
+      requests = prService.search(new PullRequestSearchRequest.Builder()
+          .state(PullRequestState.OPEN)
+          .build(), new PageRequestImpl(start, 10));
+      for (PullRequest pr : requests.getValues()) {
+        Page<Commit> commits = prService.getCommits(pr.getToRef().getRepository().getId(), pr.getId(), new PageRequestImpl(0, MAX_COMMITS));
+        for (Commit c : commits.getValues()) {
+          if (c.getId().equals(commitId)) {
+            return pr;
+          }
+        }
+      }
+      start += 10;
+    }
+    return null;
+  }
 }
