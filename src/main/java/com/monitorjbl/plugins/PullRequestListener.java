@@ -1,7 +1,7 @@
 package com.monitorjbl.plugins;
 
 import com.atlassian.event.api.EventListener;
-//import com.atlassian.stash.build.BuildStatusSetEvent;
+import com.atlassian.stash.build.BuildStatusSetEvent;
 import com.atlassian.stash.commit.Commit;
 import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
 import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
@@ -76,13 +76,13 @@ public class PullRequestListener {
     automergePullRequest(event.getPullRequest());
   }
 
-//  @EventListener
-//  public void buildStatusListener(BuildStatusSetEvent event) {
-//    PullRequest pr = findPRByCommitId(event.getCommitId());
-//    if (pr != null) {
-//      automergePullRequest(pr);
-//    }
-//  }
+  @EventListener
+  public void buildStatusListener(BuildStatusSetEvent event) {
+    PullRequest pr = findPRByCommitId(event.getCommitId());
+    if (pr != null) {
+      automergePullRequest(pr);
+    }
+  }
 
   void automergePullRequest(final PullRequest pr) {
     Repository repo = pr.getToRef().getRepository();

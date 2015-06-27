@@ -44,11 +44,11 @@
       <artifactId>stash-spi</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.atlassian.stash</groupId>-->
-      <!--<artifactId>stash-build-integration</artifactId>-->
-      <!--<scope>provided</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.atlassian.stash</groupId>
+      <artifactId>stash-build-integration</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>com.atlassian.stash</groupId>
       <artifactId>stash-scm-git-api</artifactId>
