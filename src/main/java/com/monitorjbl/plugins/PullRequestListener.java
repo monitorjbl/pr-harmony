@@ -47,7 +47,7 @@ public class PullRequestListener {
   }
 
   @EventListener
-  public void populateDefaultReviewers(PullRequestOpenedEvent event) {
+  public void populateReviewers(PullRequestOpenedEvent event) {
     final PullRequest pr = event.getPullRequest();
     final Repository repo = pr.getToRef().getRepository();
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
@@ -58,7 +58,7 @@ public class PullRequestListener {
       public String apply(PullRequestParticipant input) {
         return input.getUser().getSlug();
       }
-    }), config.getDefaultReviewers(), utils.dereferenceGroups(config.getDefaultReviewerGroups())));
+    }), config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups())));
 
     securityService.withPermission(Permission.ADMIN, "Adding default reviewers").call(new Operation<Object, RuntimeException>() {
       public Object perform() throws RuntimeException {
