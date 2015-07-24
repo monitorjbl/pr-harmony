@@ -14,7 +14,7 @@
     }
 
     $.ajax({
-      url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + repoSlug,
+      url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + (repoSlug || ''),
       type: "PUT",
       contentType: "application/json",
       data: JSON.stringify({
@@ -38,7 +38,7 @@
 
   function getConfig() {
     $.ajax({
-      url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + repoSlug,
+      url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + (repoSlug || ''),
       dataType: "json",
       success: function (config) {
         $('#requiredReviews').val(config.requiredReviews);

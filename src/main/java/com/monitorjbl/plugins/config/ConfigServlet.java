@@ -3,6 +3,8 @@ package com.monitorjbl.plugins.config;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
+import com.atlassian.stash.project.Project;
+import com.atlassian.stash.project.ProjectService;
 import com.atlassian.stash.repository.Repository;
 import com.atlassian.stash.repository.RepositoryService;
 import com.atlassian.stash.user.Permission;
@@ -28,15 +30,18 @@ public class ConfigServlet extends HttpServlet {
   private final UserManager userManager;
   private final UserService userService;
   private final RepositoryService repoService;
+  private final ProjectService projectService;
   private final TemplateRenderer renderer;
   private final PermissionService permissionService;
   private final LoginUriProvider loginUriProvider;
 
   public ConfigServlet(UserManager userManager, UserService userService, RepositoryService repoService,
-                       TemplateRenderer renderer, PermissionService permissionService, LoginUriProvider loginUriProvider) {
+                       ProjectService projectService, TemplateRenderer renderer, PermissionService permissionService,
+                       LoginUriProvider loginUriProvider) {
     this.userManager = userManager;
     this.userService = userService;
     this.repoService = repoService;
+    this.projectService = projectService;
     this.renderer = renderer;
     this.permissionService = permissionService;
     this.loginUriProvider = loginUriProvider;
@@ -54,15 +59,20 @@ public class ConfigServlet extends HttpServlet {
 
   void handleRequest(String requestPath, String username, HttpServletResponse response) throws IOException {
     String[] coords = requestPath.replaceAll(".*" + SERVLET_PATH, "").split("/");
-    if (coords.length != 2) {
+    if (coords.length == 1) {
+      renderProjectSettings(coords[0], username, response);
+    } else if (coords.length == 2) {
+      renderRepoSettings(coords[0], coords[1], username, response);
+    } else {
       logger.warn("Malformed request path, expecting {}{projectKey}/{repoSlug}", SERVLET_PATH);
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      return;
     }
+  }
 
-    Repository repo = repoService.getBySlug(coords[0], coords[1]);
+  void renderRepoSettings(String projectKey, String repoSlug, String username, HttpServletResponse response) throws IOException {
+    Repository repo = repoService.getBySlug(projectKey, repoSlug);
     if (repo == null) {
-      logger.warn("Project/Repo [{}/{}] not found for user {}", coords[0], coords[1], username);
+      logger.warn("Project/Repo [{}/{}] not found for user {}", projectKey, repoSlug, username);
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
@@ -71,9 +81,30 @@ public class ConfigServlet extends HttpServlet {
     if (permissionService.hasRepositoryPermission(stashUser, repo, Permission.REPO_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
-      renderer.render("config.html", ImmutableMap.<String, Object>of(
-          "projectKey", coords[0],
-          "repositorySlug", coords[1]
+      renderer.render("repo-config.html", ImmutableMap.<String, Object>of(
+          "projectKey", projectKey,
+          "repositorySlug", repoSlug
+      ), response.getWriter());
+    } else {
+      logger.debug("Permission denied for user [{}]", username);
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    }
+  }
+
+  void renderProjectSettings(String projectKey, String username, HttpServletResponse response) throws IOException {
+    Project project = projectService.getByKey(projectKey);
+    if (project == null) {
+      logger.warn("Project [{}] not found for user {}", projectKey, username);
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
+    StashUser stashUser = userService.getUserBySlug(username);
+    if (permissionService.hasProjectPermission(stashUser, project, Permission.PROJECT_ADMIN)) {
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.setContentType("text/html;charset=utf-8");
+      renderer.render("project-config.html", ImmutableMap.<String, Object>of(
+          "projectKey", projectKey
       ), response.getWriter());
     } else {
       logger.debug("Permission denied for user [{}]", username);

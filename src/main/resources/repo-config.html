@@ -1,0 +1,97 @@
+<html>
+<head>
+    <title>$i18n.getText("config.title")</title>
+    $webResourceManager.requireResource("com.monitorjbl.plugins.pr-harmony:resources")
+    <meta name="decorator" content="stash.repository.settings"/>
+    <meta name="projectKey" content="$projectKey">
+    <meta name="repositorySlug" content="$repositorySlug">
+    <meta name="activeTab" content="pr-harmony-repo-config">
+</head>
+<body>
+<input id="baseUrl" type="hidden" value="$applicationProperties.getBaseUrl()"/>
+<input id="projectKey" type="hidden" value="$projectKey"/>
+<input id="repoSlug" type="hidden" value="$repositorySlug"/>
+
+<h1><span class="plugin-logo">&nbsp;</span> $i18n.getText("config.header")</h1>
+
+<hr/>
+
+<h3>$i18n.getText("config.mergeBlocker.header")</h3>
+
+<form id="mergeBlockerConfig" class="aui">
+    <div class="field-group">
+        <label for="defaultReviewers">$i18n.getText("config.defaultReviewers.label")</label>
+        <input class="text config" type="text" id="defaultReviewers" name="defaultReviewers">
+
+        <div class="description">$i18n.getText("config.defaultReviewers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="defaultReviewerGroups">$i18n.getText("config.defaultReviewerGroups.label")</label>
+        <input class="text config" type="text" id="defaultReviewerGroups" name="defaultReviewerGroups">
+
+        <div class="description">$i18n.getText("config.defaultReviewerGroups.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="requiredReviewers">$i18n.getText("config.requiredReviewers.label")</label>
+        <input class="text config" type="text" id="requiredReviewers" name="requiredReviewers">
+
+        <div class="description">$i18n.getText("config.requiredReviewers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="requiredReviewerGroups">$i18n.getText("config.requiredReviewerGroups.label")</label>
+        <input class="text config" type="text" id="requiredReviewerGroups" name="requiredReviewerGroups">
+
+        <div class="description">$i18n.getText("config.requiredReviewerGroups.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="automergePRs">$i18n.getText("config.automergePRs.label")</label>
+        <input class="text config" type="text" id="automergePRs" name="automergePRs">
+
+        <div class="description">$i18n.getText("config.automergePRs.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="automergePRsFrom">$i18n.getText("config.automergePRsFrom.label")</label>
+        <input class="text config" type="text" id="automergePRsFrom" name="automergePRsFrom">
+
+        <div class="description">$i18n.getText("config.automergePRsFrom.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="requiredReviewers">$i18n.getText("config.requiredReviews.label")</label>
+        <input class="text" type="number" style="width:50px" id="requiredReviews" name="requiredReviews">
+
+        <div class="description">$i18n.getText("config.requiredReviews.description")</div>
+    </div>
+</form>
+
+<h3>$i18n.getText("config.branchProtection.header")</h3>
+
+<form id="commitBlockerConfig" class="aui">
+    <div class="field-group">
+        <label for="blockedCommits">$i18n.getText("config.blockedCommits.label")</label>
+        <input class="text config" type="text" id="blockedCommits" name="blockedCommits">
+
+        <div class="description">$i18n.getText("config.blockedCommits.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="excludedUsers">$i18n.getText("config.excludedUsers.label")</label>
+        <input class="text config" type="text" id="excludedUsers" name="excludedUsers">
+
+        <div class="description">$i18n.getText("config.excludedUsers.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="excludedGroups">$i18n.getText("config.excludedGroups.label")</label>
+        <input class="text config" type="text" id="excludedGroups" name="excludedGroups">
+
+        <div class="description">$i18n.getText("config.excludedGroups.description")</div>
+    </div>
+    <div class="field-group">
+        <label for="blockedPRs">$i18n.getText("config.blockedPRs.label")</label>
+        <input class="text config" type="text" id="blockedPRs" name="blockedPRs">
+
+        <div class="description">$i18n.getText("config.blockedPRs.description")</div>
+    </div>
+</form>
+
+<button id="saveButton" class="aui-button">$i18n.getText("config.save.label")</button>
+</body>
+</html>

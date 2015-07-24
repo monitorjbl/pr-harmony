@@ -2,17 +2,16 @@
 <head>
     <title>$i18n.getText("config.title")</title>
     $webResourceManager.requireResource("com.monitorjbl.plugins.pr-harmony:resources")
-    <meta name="decorator" content="stash.repository.settings"/>
+    <meta name="decorator" content="stash.project.settings"/>
     <meta name="projectKey" content="$projectKey">
-    <meta name="repositorySlug" content="$repositorySlug">
-    <meta name="activeTab" content="pr-harmony-config">
+    <meta name="activeTab" content="pr-harmony-proj-config">
 </head>
 <body>
 <input id="baseUrl" type="hidden" value="$applicationProperties.getBaseUrl()"/>
 <input id="projectKey" type="hidden" value="$projectKey"/>
-<input id="repoSlug" type="hidden" value="$repositorySlug"/>
 
 <h1><span class="plugin-logo">&nbsp;</span> $i18n.getText("config.header")</h1>
+<small>$i18n.getText("config.project.info")</small>
 
 <hr/>
 

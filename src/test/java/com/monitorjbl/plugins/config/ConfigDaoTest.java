@@ -15,6 +15,8 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("unchecked")
@@ -54,5 +56,29 @@ public class ConfigDaoTest {
   public void testSplit_blank() throws Exception {
     List<String> str = sut.split("");
     assertThat(str, CoreMatchers.<List<String>>equalTo(Lists.<String>newArrayList()));
+  }
+
+  @Test
+  public void testOverlayList_topHasValue() throws Exception {
+    List<String> str = sut.overlay(newArrayList("bottom"), newArrayList("top"));
+    assertThat(str, contains("top"));
+  }
+
+  @Test
+  public void testOverlayList_topHasNoValue() throws Exception {
+    List<String> str = sut.overlay(newArrayList("bottom"), Lists.<String>newArrayList());
+    assertThat(str, contains("bottom"));
+  }
+
+  @Test
+  public void testReverseOverlayList_valuesEqual() throws Exception {
+    List<String> str = sut.reverseOverlay(newArrayList("bottom"), newArrayList("bottom"));
+    assertThat(str, nullValue());
+  }
+
+  @Test
+  public void testReverseOverlayList_valuesNotEqual() throws Exception {
+    List<String> str = sut.reverseOverlay(newArrayList("bottom"), newArrayList("top"));
+    assertThat(str, contains("top"));
   }
 }
