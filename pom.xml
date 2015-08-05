@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.monitorjbl.plugins</groupId>
   <artifactId>pr-harmony</artifactId>
   <version>1.6-SNAPSHOT</version>
   <packaging>atlassian-plugin</packaging>
-
   <name>PR Harmony</name>
   <description>Provides additional pull request workflows for your team</description>
   <organization>
     <name>Taylor Jones</name>
     <url>http://monitorjbl.github.io</url>
   </organization>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -27,7 +24,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>com.atlassian.sal</groupId>
@@ -45,9 +41,9 @@
       <scope>provided</scope>
     </dependency>
     <!--<dependency>-->
-      <!--<groupId>com.atlassian.stash</groupId>-->
-      <!--<artifactId>stash-build-integration</artifactId>-->
-      <!--<scope>provided</scope>-->
+    <!--<groupId>com.atlassian.stash</groupId>-->
+    <!--<artifactId>stash-build-integration</artifactId>-->
+    <!--<scope>provided</scope>-->
     <!--</dependency>-->
     <dependency>
       <groupId>com.atlassian.stash</groupId>
@@ -76,7 +72,6 @@
       <version>2.6</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -95,7 +90,6 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
-
     <!-- WIRED TEST RUNNER DEPENDENCIES -->
     <dependency>
       <groupId>com.atlassian.plugins</groupId>
@@ -115,7 +109,6 @@
       <version>2.2.2-atlassian-1</version>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -145,11 +138,10 @@
       </plugin>
     </plugins>
   </build>
-
   <properties>
     <stash.version>3.9.1</stash.version>
     <stash.data.version>3.5.1</stash.data.version>
-    <amps.version>5.0.13</amps.version>
+    <amps.version>5.1.6</amps.version>
     <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
