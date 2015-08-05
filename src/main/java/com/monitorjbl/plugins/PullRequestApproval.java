@@ -24,7 +24,8 @@ public class PullRequestApproval {
   }
 
   public boolean isPullRequestApproved(PullRequest pr) {
-    return seenReviewers(pr).size() >= config.getRequiredReviews();
+    Integer requiredReviews = config.getRequiredReviews();
+    return requiredReviews == null || seenReviewers(pr).size() >= requiredReviews;
   }
 
   public Set<String> missingRevieiwers(PullRequest pr) {
