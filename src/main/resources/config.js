@@ -52,6 +52,80 @@
         $('#blockedPRs').val(config.blockedPRs);
         $('#automergePRs').val(config.automergePRs);
         $('#automergePRsFrom').val(config.automergePRsFrom);
+
+        //initialize selections
+        userSelection("#defaultReviewers");
+        userSelection("#requiredReviewers");
+        groupSelection("#defaultReviewerGroups");
+        groupSelection("#requiredReviewerGroups");
+      }
+    });
+  }
+
+  function userSelection(ele) {
+    $(ele).auiSelect2({
+      placeholder: "Search for a user",
+      minimumInputLength: 2,
+      multiple: true,
+      initSelection: function (element, callback) {
+        callback($.map($(element).val().split(','), function (v, i) {
+          return {id: v.trim(), name: v.trim()};
+        }));
+      },
+      ajax: {
+        url: function (search) {
+          return baseUrl + "/rest/api/latest/users?avatarSize=32&permission.1=LICENSED_USER&start=0&filter=" + search;
+        },
+        dataType: 'json',
+        quietMillis: 250,
+        results: function (data) {
+          //format results to Select2 format by adding a unique id field
+          $.each(data.values, function () {
+            this.id = this.name;
+          });
+          return {results: data.values}
+        },
+        cache: true
+      },
+      formatResult: function (user) {
+        return '<div>' + user.displayName + ' (' + user.emailAddress + ')</div>';
+      },
+      formatSelection: function (user) {
+        return user.name;
+      }
+    });
+  }
+
+  function groupSelection(ele) {
+    $(ele).auiSelect2({
+      placeholder: "Search for a group",
+      minimumInputLength: 2,
+      multiple: true,
+      initSelection: function (element, callback) {
+        callback($.map($(element).val().split(','), function (v, i) {
+          return {id: v.trim(), name: v.trim()};
+        }));
+      },
+      ajax: {
+        url: function (search) {
+          return baseUrl + "/projects/" + projectKey + "/permissions/groups/none?start=0&avatarSize=32&filter=" + search;
+        },
+        dataType: 'json',
+        quietMillis: 250,
+        results: function (data) {
+          //format results to Select2 format by adding a unique id field
+          $.each(data.values, function () {
+            this.id = this.name;
+          });
+          return {results: data.values}
+        },
+        cache: true
+      },
+      formatResult: function (group) {
+        return '<div>' + group.name + '</div>';
+      },
+      formatSelection: function (group) {
+        return group.name;
       }
     });
   }
@@ -60,6 +134,7 @@
     baseUrl = $("#baseUrl").val();
     projectKey = $("#projectKey").val();
     repoSlug = $("#repoSlug").val();
+    groupSelection("#select2-example");
     $('#saveButton').click(function () {
       saveConfig();
     });

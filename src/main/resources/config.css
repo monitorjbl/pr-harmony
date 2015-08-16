@@ -1,7 +1,3 @@
-form.aui input.config.text {
-    max-width: 525px;
-}
-
 .plugin-logo {
     display: inline-block;
     background-image: url(pluginIcon.png);
@@ -10,11 +6,15 @@ form.aui input.config.text {
     width: 28px;
 }
 
+form.aui input.config.text, form.aui .select2-container {
+    max-width: 525px;
+}
+
 form.aui legend, form.aui .field-group > label {
     width: 200px;
 }
 
-form.aui .text {
+form.aui .text, form.aui .select2-container {
     margin-left: 35px;
 }
 
