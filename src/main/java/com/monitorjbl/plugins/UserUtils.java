@@ -32,12 +32,20 @@ public class UserUtils {
         cfg.getRequiredReviewers(),
         dereferenceGroups(cfg.getDefaultReviewerGroups()),
         dereferenceGroups(cfg.getRequiredReviewerGroups()));
+    return newArrayList(dereferenceUsers(defaultAndRequired));
+  }
 
-    for (String u : defaultAndRequired) {
-      StashUser user = userService.getUserBySlug(u);
-      users.add(new User(user.getSlug(), user.getDisplayName()));
+  public List<User> dereferenceUsers(Iterable<String> users) {
+    List<User> list = newArrayList();
+    for (String u : users) {
+      list.add(getUserByName(u));
     }
-    return newArrayList(users);
+    return list;
+  }
+
+  public User getUserByName(String username) {
+    StashUser user = userService.getUserBySlug(username);
+    return new User(user.getSlug(), user.getDisplayName());
   }
 
   public List<String> dereferenceGroups(List<String> groups) {
@@ -49,4 +57,6 @@ public class UserUtils {
     }
     return users;
   }
+
+
 }

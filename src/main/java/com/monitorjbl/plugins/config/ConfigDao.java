@@ -14,6 +14,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 public class ConfigDao {
+  public static final String CHOOSE_REQUIRED_REVIEWERS = "chooseRequiredReviewers";
   public static final String REQUIRED_REVIEWS = "requiredReviews";
   public static final String REQUIRED_REVIWERS = "requiredReviewers";
   public static final String REQUIRED_REVIWER_GROUPS = "requiredReviewerGroups";
@@ -53,6 +54,7 @@ public class ConfigDao {
 
   Config readConfig(PluginSettings settings) {
     return Config.builder()
+        .chooseRequiredReviewers(parseBoolean(get(settings, CHOOSE_REQUIRED_REVIEWERS, null)))
         .requiredReviews(parseInt(get(settings, REQUIRED_REVIEWS, null)))
         .requiredReviewers(split(get(settings, REQUIRED_REVIWERS, "")))
         .requiredReviewerGroups(split(get(settings, REQUIRED_REVIWER_GROUPS, "")))
@@ -69,6 +71,7 @@ public class ConfigDao {
 
   @SuppressWarnings("unchecked")
   void writeConfig(PluginSettings settings, Config config) {
+    settings.put(CHOOSE_REQUIRED_REVIEWERS, toString(config.getChooseRequiredReviewers()));
     settings.put(REQUIRED_REVIEWS, toString(config.getRequiredReviews()));
     settings.put(REQUIRED_REVIWERS, join(config.getRequiredReviewers(), new FilterInvalidUsers()));
     settings.put(REQUIRED_REVIWER_GROUPS, join(config.getRequiredReviewerGroups(), new FilterInvalidGroups()));
@@ -89,6 +92,7 @@ public class ConfigDao {
    */
   Config overlayConfig(Config bottom, Config top) {
     return Config.builder()
+        .chooseRequiredReviewers(top.getChooseRequiredReviewers() != null ? top.getChooseRequiredReviewers() : bottom.getChooseRequiredReviewers())
         .requiredReviews(top.getRequiredReviews() != null ? top.getRequiredReviews() : bottom.getRequiredReviews())
         .requiredReviewers(overlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
         .requiredReviewerGroups(overlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
@@ -110,6 +114,7 @@ public class ConfigDao {
    */
   Config reverseOverlayConfig(Config bottom, Config top) {
     return Config.builder()
+        .chooseRequiredReviewers(top.getChooseRequiredReviewers() == null ? bottom.getChooseRequiredReviewers() : top.getChooseRequiredReviewers())
         .requiredReviews(Objects.equals(top.getRequiredReviews(), bottom.getRequiredReviews()) ? null : top.getRequiredReviews())
         .requiredReviewers(reverseOverlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
         .requiredReviewerGroups(reverseOverlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
@@ -145,8 +150,16 @@ public class ConfigDao {
     return str == null ? null : Integer.parseInt(str);
   }
 
+  Boolean parseBoolean(String str) {
+    return str == null ? null : Boolean.parseBoolean(str);
+  }
+
   String toString(Integer integer) {
     return integer == null ? null : Integer.toString(integer);
+  }
+
+  String toString(Boolean bool) {
+    return bool == null ? null : Boolean.toString(bool);
   }
 
   PluginSettings repoSettings(String projectKey, String repoSlug) {

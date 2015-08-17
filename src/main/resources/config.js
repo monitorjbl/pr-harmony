@@ -18,6 +18,7 @@
       type: "PUT",
       contentType: "application/json",
       data: JSON.stringify({
+        chooseRequiredReviewers: $('#chooseRequiredReviewers').is(':checked'),
         requiredReviews: requiredReviews,
         requiredReviewers: requiredReviewers,
         requiredReviewerGroups: requiredReviewerGroups,
@@ -41,6 +42,7 @@
       url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + (repoSlug || ''),
       dataType: "json",
       success: function (config) {
+        $('#chooseRequiredReviewers').prop('checked', config.chooseRequiredReviewers);
         $('#requiredReviews').val(config.requiredReviews);
         $('#requiredReviewers').val(config.requiredReviewers);
         $('#requiredReviewerGroups').val(config.requiredReviewerGroups);
