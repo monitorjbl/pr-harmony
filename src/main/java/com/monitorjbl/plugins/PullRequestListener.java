@@ -53,24 +53,22 @@ public class PullRequestListener {
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
 
     //unless we are making the user do it, automatically combine existing reviewers with required reviewers
-    if (config.getChooseRequiredReviewers() == null || !config.getChooseRequiredReviewers()) {
-      final Set<String> reviewers = newHashSet(concat(transform(pr.getReviewers(), new Function<PullRequestParticipant, String>() {
-        @Override
-        public String apply(PullRequestParticipant input) {
-          return input.getUser().getSlug();
-        }
-      }), config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups())));
-      securityService.withPermission(Permission.ADMIN, "Adding default reviewers").call(new Operation<Object, RuntimeException>() {
-        public Object perform() throws RuntimeException {
-          for (String u : reviewers) {
-            if (!pr.getAuthor().getUser().getSlug().equals(u)) {
-              prService.assignRole(repo.getId(), pr.getId(), u, PullRequestRole.REVIEWER);
-            }
-          }
-          return null;
-        }
-      });
-    }
+//    final Set<String> reviewers = newHashSet(concat(transform(pr.getReviewers(), new Function<PullRequestParticipant, String>() {
+//      @Override
+//      public String apply(PullRequestParticipant input) {
+//        return input.getUser().getSlug();
+//      }
+//    }), config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups())));
+//    securityService.withPermission(Permission.ADMIN, "Adding default reviewers").call(new Operation<Object, RuntimeException>() {
+//      public Object perform() throws RuntimeException {
+//        for (String u : reviewers) {
+//          if (!pr.getAuthor().getUser().getSlug().equals(u)) {
+//            prService.assignRole(repo.getId(), pr.getId(), u, PullRequestRole.REVIEWER);
+//          }
+//        }
+//        return null;
+//      }
+//    });
   }
 
   @EventListener

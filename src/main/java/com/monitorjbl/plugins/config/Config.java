@@ -15,7 +15,6 @@ public class Config {
   private List<String> requiredReviewers = newArrayList();
   private List<String> requiredReviewerGroups = newArrayList();
   private Integer requiredReviews = 0;
-  private Boolean chooseRequiredReviewers;
   private List<String> blockedCommits = newArrayList();
   private List<String> blockedPRs = newArrayList();
   private List<String> automergePRs = newArrayList();
@@ -32,7 +31,6 @@ public class Config {
     setRequiredReviewers(builder.requiredReviewers);
     setRequiredReviewerGroups(builder.requiredReviewerGroups);
     setRequiredReviews(builder.requiredReviews);
-    setChooseRequiredReviewers(builder.chooseRequiredReviewers);
     setBlockedCommits(builder.blockedCommits);
     setBlockedPRs(builder.blockedPRs);
     setAutomergePRs(builder.automergePRs);
@@ -71,14 +69,6 @@ public class Config {
 
   public void setRequiredReviewerGroups(List<String> requiredReviewerGroups) {
     this.requiredReviewerGroups = requiredReviewerGroups;
-  }
-
-  public Boolean getChooseRequiredReviewers() {
-    return chooseRequiredReviewers;
-  }
-
-  public void setChooseRequiredReviewers(Boolean chooseRequiredReviewers) {
-    this.chooseRequiredReviewers = chooseRequiredReviewers;
   }
 
   public Integer getRequiredReviews() {
@@ -151,7 +141,6 @@ public class Config {
     private List<String> requiredReviewers = newArrayList();
     private List<String> requiredReviewerGroups = newArrayList();
     private Integer requiredReviews = 0;
-    private Boolean chooseRequiredReviewers;
     private List<String> blockedCommits = newArrayList();
     private List<String> blockedPRs = newArrayList();
     private List<String> automergePRs = newArrayList();
@@ -168,7 +157,6 @@ public class Config {
       requiredReviewers = newArrayList(copy.requiredReviewers);
       requiredReviewerGroups = newArrayList(copy.requiredReviewerGroups);
       requiredReviews = copy.requiredReviews;
-      chooseRequiredReviewers = copy.chooseRequiredReviewers;
       blockedCommits = newArrayList(copy.blockedCommits);
       blockedPRs = newArrayList(copy.blockedPRs);
       automergePRs = newArrayList(copy.automergePRs);
@@ -199,11 +187,6 @@ public class Config {
 
     public Builder requiredReviews(Integer requiredReviews) {
       this.requiredReviews = requiredReviews;
-      return this;
-    }
-
-    public Builder chooseRequiredReviewers(Boolean chooseRequiredReviewers) {
-      this.chooseRequiredReviewers = chooseRequiredReviewers;
       return this;
     }
 

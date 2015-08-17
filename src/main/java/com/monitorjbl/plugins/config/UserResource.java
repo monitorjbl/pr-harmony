@@ -29,7 +29,6 @@ public class UserResource {
   public Response get(@PathParam("projectKey") String projectKey, @PathParam("repoSlug") String repoSlug) {
     Config config = configDao.getConfigForRepo(projectKey, repoSlug);
     return Response.ok(ImmutableMap.of(
-        "chooseRequiredReviewers", config.getChooseRequiredReviewers(),
         "requiredReviews", config.getRequiredReviews(),
         "requiredReviewers", utils.dereferenceUsers(newArrayList(newHashSet(concat(
             utils.dereferenceGroups(config.getRequiredReviewerGroups()),

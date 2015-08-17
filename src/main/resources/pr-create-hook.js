@@ -9,7 +9,6 @@ define('suggested-reviewers', [
   var root = AJS.contextPath(),
       selection = $('.field-group.pull-request-reviewers #reviewers'),
       config,
-      defaultReviewers,
       warning,
       currentUser,
       projectKey,
@@ -21,7 +20,6 @@ define('suggested-reviewers', [
     projectKey = action.substring(0, action.indexOf("/"));
     repoSlug = action.substring(action.indexOf("/")).replace('/repos/', '');
     repoSlug = repoSlug.substring(0, repoSlug.indexOf("/"));
-    $('#submit-form').prop('disabled', true);
   })();
 
   var addUser = function (user) {
@@ -83,7 +81,7 @@ define('suggested-reviewers', [
 
     if (warning) {
       $(warning).find('span.body').html(body);
-    } else {
+    } else if (selection.is(":visible")) {
       warning = flag({
         type: 'warning',
         title: 'Cannot Open PR',
@@ -112,21 +110,23 @@ define('suggested-reviewers', [
           }
         }
       });
+    } else if (callback) {
+      callback();
     }
   };
 
   exports.init = function () {
-    var fetch = function () {
-      fetchUsers();
+    var load = function () {
+      fetchUsers(function () {
+        addAllUsers();
+        handleChange();
+      });
     };
-    events.on("stash.model.page-state.changed.sourceBranch", fetch);
-    events.on("stash.model.page-state.changed.targetBranch", fetch);
-    events.on("stash.feature.compare.form.state", fetch);
+    events.on("stash.model.page-state.changed.sourceBranch", fetchUsers);
+    events.on("stash.model.page-state.changed.targetBranch", fetchUsers);
+    events.on("stash.feature.compare.form.state", load);
     selection.on("change", handleChange);
-    fetchUsers(function () {
-      addAllUsers();
-      handleChange();
-    });
+    load();
   };
 });
 
