@@ -140,55 +140,6 @@ public class PullRequestListenerTest {
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
-  @Test
-  public void testDefaultReviewers_defaultConfig() throws Exception {
-    Set<PullRequestParticipant> p = newHashSet(
-        mockParticipant("user1", false)
-    );
-    PullRequestParticipant author = mockParticipant("author", false);
-    when(pr.getReviewers()).thenReturn(p);
-    when(pr.getAuthor()).thenReturn(author);
-    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder().build());
-    sut.populateReviewers(openedEvent);
-
-    verify(prService, times(1)).assignRole(anyInt(), anyLong(), anyString(), any(PullRequestRole.class));
-    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
-  }
-
-  @Test
-  public void testDefaultReviewers_noReviewers() throws Exception {
-    PullRequestParticipant author = mockParticipant("author", false);
-    when(pr.getReviewers()).thenReturn(Sets.<PullRequestParticipant>newHashSet());
-    when(pr.getAuthor()).thenReturn(author);
-    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
-        .requiredReviewers(newArrayList("user1", "user2"))
-        .build());
-    sut.populateReviewers(openedEvent);
-
-    verify(prService, times(2)).assignRole(anyInt(), anyLong(), anyString(), any(PullRequestRole.class));
-    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
-    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user2", PullRequestRole.REVIEWER);
-  }
-
-  @Test
-  public void testDefaultReviewers_addedReviewers() throws Exception {
-    Set<PullRequestParticipant> p = newHashSet(
-        mockParticipant("user1", false)
-    );
-    PullRequestParticipant author = mockParticipant("author", false);
-    when(pr.getReviewers()).thenReturn(p);
-    when(pr.getAuthor()).thenReturn(author);
-    when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder()
-        .requiredReviewers(newArrayList("user2", "user3"))
-        .build());
-    sut.populateReviewers(openedEvent);
-
-    verify(prService, times(3)).assignRole(anyInt(), anyLong(), anyString(), any(PullRequestRole.class));
-    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user1", PullRequestRole.REVIEWER);
-    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user2", PullRequestRole.REVIEWER);
-    verify(prService, times(1)).assignRole(toRepo.getId(), pr.getId(), "user3", PullRequestRole.REVIEWER);
-  }
-
   static class MockSecurityContext implements EscalatedSecurityContext {
 
     @Override

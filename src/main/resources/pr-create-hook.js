@@ -69,8 +69,8 @@ define('suggested-reviewers', [
   };
 
   var showFlag = function () {
-    var body = '<p>Please add ' + (config.requiredReviews - currentRequired().length) +
-        ' more reviewers from the following required reviewers</p><ul>';
+    var body = '<p>Your PR must have ' + config.requiredReviews + ' required reviewers on it. Please add ' +
+        (config.requiredReviews - currentRequired().length) + ' of the following:</p><ul>';
     var curr = current();
     $.each(config.requiredReviewers, function (i, v) {
       if ($.inArray(v.slug, curr) < 0) {
@@ -84,7 +84,7 @@ define('suggested-reviewers', [
     } else if (selection.is(":visible")) {
       warning = flag({
         type: 'warning',
-        title: 'Cannot Open PR',
+        title: 'Missing required reviewers',
         persistent: false,
         body: '<span class="body">' + body + '</span>'
       });
@@ -105,12 +105,12 @@ define('suggested-reviewers', [
         dataType: "json",
         success: function (data) {
           config = data;
-          if (callback) {
+          if (typeof callback == 'function') {
             callback();
           }
         }
       });
-    } else if (callback) {
+    } else if (typeof callback == 'function') {
       callback();
     }
   };

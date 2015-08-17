@@ -5,8 +5,6 @@ import com.atlassian.stash.user.UserService;
 import com.atlassian.stash.util.Page;
 import com.atlassian.stash.util.PageRequest;
 import com.google.common.base.Predicate;
-import com.monitorjbl.plugins.config.Config;
-import com.monitorjbl.plugins.config.ConfigDao;
 import com.monitorjbl.plugins.config.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.monitorjbl.plugins.TestUtils.mockStashUser;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -33,8 +30,6 @@ public class UserUtilsTest {
 
   @Mock
   private UserService userService;
-  @Mock
-  private ConfigDao configDao;
   @InjectMocks
   UserUtils sut;
 
@@ -78,32 +73,5 @@ public class UserUtilsTest {
     assertThat(result, is(notNullValue()));
     assertThat(result.size(), equalTo(4));
     assertThat(result, hasItems("user1", "user2", "user3", "user4"));
-  }
-
-  @Test
-  public void testDefaultAndRequiredUsers() {
-    when(configDao.getConfigForRepo("PRJ", "rep")).thenReturn(Config.builder()
-        .requiredReviewers(newArrayList("userA"))
-        .requiredReviewerGroups(newArrayList("group1"))
-        .defaultReviewers(newArrayList("userB"))
-        .defaultReviewerGroups(newArrayList("group2"))
-        .build());
-    List<User> users = sut.getDefaultAndRequiredUsers("PRJ", "rep");
-    assertThat(users, is(notNullValue()));
-    assertThat(find(users, userBySlug("userA")), is(notNullValue()));
-    assertThat(find(users, userBySlug("userB")), is(notNullValue()));
-    assertThat(find(users, userBySlug("user1")), is(notNullValue()));
-    assertThat(find(users, userBySlug("user2")), is(notNullValue()));
-    assertThat(find(users, userBySlug("user3")), is(notNullValue()));
-    assertThat(find(users, userBySlug("user4")), is(notNullValue()));
-  }
-
-  Predicate<User> userBySlug(final String slug) {
-    return new Predicate<User>() {
-      @Override
-      public boolean apply(User input) {
-        return slug.equals(input.getSlug());
-      }
-    };
   }
 }
