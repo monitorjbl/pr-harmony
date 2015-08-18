@@ -148,6 +148,11 @@ public class PullRequestListenerTest {
       return null;
     }
 
+    @Override
+    public void applyToRequest() {
+      
+    }
+
     @Nonnull
     @Override
     public EscalatedSecurityContext withPermission(Permission permission) {
