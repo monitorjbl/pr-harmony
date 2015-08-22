@@ -148,10 +148,10 @@ public class PullRequestListenerTest {
       return null;
     }
 
-    @Override
-    public void applyToRequest() {
-      
-    }
+//    @Override
+//    public void applyToRequest() {
+//
+//    }
 
     @Nonnull
     @Override

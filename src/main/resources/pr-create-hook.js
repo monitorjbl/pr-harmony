@@ -49,8 +49,9 @@ define('suggested-reviewers', [
   };
 
   var currentRequired = function () {
-    return $.grep(current(), function (v) {
-      return $.grep(config.requiredReviewers, function (r) { return r.slug == v }).length > 0;
+    return $.grep(config.requiredReviewers, function (r) {
+      console.log(currentUser.name);
+      return r.slug == currentUser.name || $.grep(current(), function (v) { return r.slug == v }).length > 0;
     });
   };
 
@@ -73,7 +74,7 @@ define('suggested-reviewers', [
         (config.requiredReviews - currentRequired().length) + ' of the following:</p><ul>';
     var curr = current();
     $.each(config.requiredReviewers, function (i, v) {
-      if ($.inArray(v.slug, curr) < 0) {
+      if (v.slug != currentUser.name && $.inArray(v.slug, curr) < 0) {
         body += '<li>' + v.name + ' (' + v.slug + ')</li>';
       }
     });

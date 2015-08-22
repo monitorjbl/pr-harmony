@@ -31,6 +31,7 @@
   <web-resource name="Config Web Resources" key="resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+    <dependency>com.atlassian.auiplugin:aui-flag</dependency>
     <resource type="download" name="config.js" location="config.js"/>
     <resource type="download" name="config.css" location="config.css"/>
     <resource type="download" name="pluginIcon.png" location="images/pluginIcon.png"/>
