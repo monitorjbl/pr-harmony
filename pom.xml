@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.monitorjbl.plugins</groupId>
   <artifactId>pr-harmony</artifactId>
-  <version>1.7-RC1</version>
+  <version>1.7-RC2</version>
   <packaging>atlassian-plugin</packaging>
 
   <name>PR Harmony</name>
@@ -145,7 +145,7 @@
   </build>
   
   <properties>
-    <stash.version>3.9.0</stash.version>
+    <stash.version>3.7.0</stash.version>
     <stash.data.version>3.5.1</stash.data.version>
     <amps.version>5.1.6</amps.version>
     <plugin.testrunner.version>1.2.3</plugin.testrunner.version>

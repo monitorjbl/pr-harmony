@@ -54,6 +54,7 @@
     <context>stash.page.pullRequest.create</context>
     <resource type="download" name="pr-create-hook.js" location="pr-create-hook.js"/>
     <dependency>com.atlassian.stash.stash-web-plugin:global</dependency>
+    <dependency>com.atlassian.auiplugin:aui-flag</dependency>
   </stash-resource>
 
   <web-item key="pr-harmony-repo-config" weight="30"
