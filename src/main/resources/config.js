@@ -56,8 +56,10 @@
         //initialize selections
         userSelection("#defaultReviewers");
         userSelection("#requiredReviewers");
+        userSelection("#excludedUsers");
         groupSelection("#defaultReviewerGroups");
         groupSelection("#requiredReviewerGroups");
+        groupSelection("#excludedGroups");
       }
     });
   }
@@ -134,7 +136,6 @@
     baseUrl = $("#baseUrl").val();
     projectKey = $("#projectKey").val();
     repoSlug = $("#repoSlug").val();
-    groupSelection("#select2-example");
     $('#saveButton').click(function () {
       saveConfig();
     });

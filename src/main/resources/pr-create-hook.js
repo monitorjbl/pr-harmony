@@ -50,7 +50,6 @@ define('suggested-reviewers', [
 
   var currentRequired = function () {
     return $.grep(config.requiredReviewers, function (r) {
-      console.log(currentUser.name);
       return r.slug == currentUser.name || $.grep(current(), function (v) { return r.slug == v }).length > 0;
     });
   };
