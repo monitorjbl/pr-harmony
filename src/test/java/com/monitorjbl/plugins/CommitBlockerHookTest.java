@@ -6,6 +6,7 @@ import com.atlassian.stash.hook.HookResponse;
 import com.atlassian.stash.project.Project;
 import com.atlassian.stash.repository.RefChange;
 import com.atlassian.stash.repository.Repository;
+import com.google.common.collect.Lists;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 import org.junit.Before;
@@ -34,6 +35,8 @@ public class CommitBlockerHookTest {
   private UserManager userManager;
   @Mock
   private RegexUtils regexUtils;
+  @Mock
+  private UserUtils userUtils;
   @InjectMocks
   private CommitBlockerHook sut;
 
@@ -59,6 +62,7 @@ public class CommitBlockerHookTest {
     when(project.getKey()).thenReturn("PRJ");
     when(userManager.getRemoteUser()).thenReturn(user);
     when(user.getUsername()).thenReturn("user1");
+    when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
     when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
     when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
   }
@@ -85,6 +89,19 @@ public class CommitBlockerHookTest {
   }
 
   @Test
+  public void testCommit_blockedWithExcludedGroup() throws Exception {
+    when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
+    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+        .blockedCommits(newArrayList("master"))
+        .excludedGroups(newArrayList("group1"))
+        .build());
+    when(userUtils.dereferenceGroups(newArrayList("group1"))).thenReturn(newArrayList("user1"));
+
+    assertThat(sut.onReceive(repository, newArrayList(change), hookResponse), is(true));
+    verify(stderr, never()).write(anyString());
+  }
+
+  @Test
   public void testCommit_notBlocked() throws Exception {
     when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
@@ -93,6 +110,5 @@ public class CommitBlockerHookTest {
     assertThat(sut.onReceive(repository, newArrayList(change), hookResponse), is(true));
     verify(stderr, never()).write(anyString());
   }
-
 
 }
