@@ -10,16 +10,10 @@ define('suggested-reviewers', [
       selection = $('.field-group.pull-request-reviewers #reviewers'),
       config,
       warning,
-      currentUser,
-      projectKey,
-      repoSlug;
+      currentUser;
 
   (function () {
     currentUser = state.getCurrentUser();
-    var action = $('form[action]').attr('action').replace(root + '/projects/', '');
-    projectKey = action.substring(0, action.indexOf("/"));
-    repoSlug = action.substring(action.indexOf("/")).replace('/repos/', '');
-    repoSlug = repoSlug.substring(0, repoSlug.indexOf("/"));
   })();
 
   var addUser = function (user) {
@@ -36,6 +30,10 @@ define('suggested-reviewers', [
       });
       select2.data(reviewers);
     }
+  };
+
+  var getTarget = function () {
+    return $('#targetRepo > span').data().repository;
   };
 
   var addAllUsers = function () {
@@ -69,6 +67,7 @@ define('suggested-reviewers', [
   };
 
   var showFlag = function () {
+    AJS.log('Showing warning flag');
     var body = '<p>Your PR must have ' + config.requiredReviews + ' required reviewers on it. Please add ' +
         (config.requiredReviews - currentRequired().length) + ' of the following:</p><ul>';
     var curr = current();
@@ -93,26 +92,26 @@ define('suggested-reviewers', [
 
   var closeFlag = function () {
     if (warning) {
+      AJS.log('Hiding warning flag');
       warning.close();
       warning = undefined;
     }
   };
 
   var fetchUsers = function (callback) {
-    if (!config) {
-      $.ajax({
-        url: root + '/rest/pr-harmony/1.0/users/' + projectKey + '/' + repoSlug,
-        dataType: "json",
-        success: function (data) {
-          config = data;
-          if (typeof callback == 'function') {
-            callback();
-          }
+    var target = getTarget();
+    AJS.log('Fetching required users');
+    $.ajax({
+      url: root + '/rest/pr-harmony/1.0/users/' + target.project.key + '/' + target.name,
+      dataType: "json",
+      success: function (data) {
+        AJS.log('Loaded required users');
+        config = data;
+        if (typeof callback == 'function') {
+          callback();
         }
-      });
-    } else if (typeof callback == 'function') {
-      callback();
-    }
+      }
+    });
   };
 
   exports.init = function () {
@@ -122,9 +121,9 @@ define('suggested-reviewers', [
         handleChange();
       });
     };
-    events.on("stash.model.page-state.changed.sourceBranch", fetchUsers);
-    events.on("stash.model.page-state.changed.targetBranch", fetchUsers);
+    events.on("stash.model.page-state.changed.targetBranch", load);
     events.on("stash.feature.compare.form.state", load);
+    $('#show-create-pr-button').click(load);
     selection.on("change", handleChange);
     load();
   };
