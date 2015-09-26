@@ -16,7 +16,7 @@ define('suggested-reviewers', [
     currentUser = state.getCurrentUser();
   })();
 
-  var addUser = function (user) {
+  function addUser(user) {
     if (user.slug != currentUser.slug) {
       var select2 = selection.data('select2');
       var reviewers = select2.data();
@@ -30,33 +30,47 @@ define('suggested-reviewers', [
       });
       select2.data(reviewers);
     }
-  };
+  }
 
-  var getTarget = function () {
+  function getTarget() {
     return $('#targetRepo > span').data().repository;
-  };
+  }
 
-  var addAllUsers = function () {
+  function addAllUsers() {
     $.each(config.defaultReviewers, function () {
       addUser(this);
     });
-  };
+  }
 
-  var current = function () {
+  function currentReviewers() {
     return $('#reviewers').val().split('|!|');
-  };
+  }
 
-  var currentRequired = function () {
+  function currentRequiredReviewers() {
+    var current = currentReviewers();
     return $.grep(config.requiredReviewers, function (r) {
-      return r.slug == currentUser.name || $.grep(current(), function (v) { return r.slug == v }).length > 0;
+      return reviewerIsSelected(current, r.slug) ||
+          (r.slug == currentUser.slug && submitterIsRequiredReviewer() && exactlyEnoughRequiredReviewers());
     });
-  };
+  }
 
-  var isSubmitEnabled = function () {
-    return currentRequired().length < config.requiredReviews;
-  };
+  function reviewerIsSelected(current, username) {
+    return $.grep(current, function (v) { return username == v }).length > 0
+  }
 
-  var handleChange = function () {
+  function submitterIsRequiredReviewer() {
+    return $.grep(config.requiredReviewers, function (v) {return currentUser.slug == v.slug}).length > 0;
+  }
+
+  function exactlyEnoughRequiredReviewers() {
+    return config.requiredReviewers.length == config.requiredReviews;
+  }
+
+  function isSubmitEnabled() {
+    return currentRequiredReviewers().length < config.requiredReviews;
+  }
+
+  function handleChange() {
     if (isSubmitEnabled()) {
       showFlag();
       $('#submit-form').prop('disabled', true);
@@ -64,13 +78,13 @@ define('suggested-reviewers', [
       closeFlag();
       $('#submit-form').prop('disabled', false);
     }
-  };
+  }
 
-  var showFlag = function () {
+  function showFlag() {
     AJS.log('Showing warning flag');
     var body = '<p>Your PR must have ' + config.requiredReviews + ' required reviewers on it. Please add ' +
-        (config.requiredReviews - currentRequired().length) + ' of the following:</p><ul>';
-    var curr = current();
+        (config.requiredReviews - currentRequiredReviewers().length) + ' of the following:</p><ul>';
+    var curr = currentReviewers();
     $.each(config.requiredReviewers, function (i, v) {
       if (v.slug != currentUser.name && $.inArray(v.slug, curr) < 0) {
         body += '<li>' + v.name + ' (' + v.slug + ')</li>';
@@ -88,17 +102,17 @@ define('suggested-reviewers', [
         body: '<span class="body">' + body + '</span>'
       });
     }
-  };
+  }
 
-  var closeFlag = function () {
+  function closeFlag() {
     if (warning) {
       AJS.log('Hiding warning flag');
       warning.close();
       warning = undefined;
     }
-  };
+  }
 
-  var fetchUsers = function (callback) {
+  function fetchConfig(callback) {
     var target = getTarget();
     AJS.log('Fetching required users');
     $.ajax({
@@ -116,7 +130,7 @@ define('suggested-reviewers', [
 
   exports.init = function () {
     var load = function () {
-      fetchUsers(function () {
+      fetchConfig(function () {
         addAllUsers();
         handleChange();
       });

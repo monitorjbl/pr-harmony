@@ -101,16 +101,50 @@ public class MergeBlockerTest {
   }
 
   @Test
-  public void testBlocking_reviewerIsAuthor() throws Exception {
+  public void testBlocking_reviewerIsAuthor_notEnoughApprovals() throws Exception {
     Set<PullRequestParticipant> p = newHashSet(
-        mockParticipant("user1", false)
+        mockParticipant("user2", false)
     );
     PullRequestParticipant author = mockParticipant("user1", false);
     when(pr.getReviewers()).thenReturn(p);
     when(pr.getAuthor()).thenReturn(author);
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedPRs(newArrayList("bugfix"))
-        .requiredReviewers(newArrayList("user1"))
+        .requiredReviewers(newArrayList("user1", "user2"))
+        .requiredReviews(1)
+        .build());
+    sut.check(merge);
+    verify(merge, times(1)).veto(anyString(), anyString());
+  }
+
+  @Test
+  public void testBlocking_reviewerIsAuthor_matchingNumberOfApprovals() throws Exception {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user2", true)
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+        .blockedPRs(newArrayList("bugfix"))
+        .requiredReviewers(newArrayList("user1", "user2"))
+        .requiredReviews(2)
+        .build());
+    sut.check(merge);
+    verify(merge, never()).veto(anyString(), anyString());
+  }
+
+  @Test
+  public void testBlocking_reviewerIsAuthor_approved() throws Exception {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user2", true)
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+        .blockedPRs(newArrayList("bugfix"))
+        .requiredReviewers(newArrayList("user2"))
         .requiredReviews(1)
         .build());
     sut.check(merge);

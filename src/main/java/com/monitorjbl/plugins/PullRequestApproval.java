@@ -6,6 +6,7 @@ import com.google.common.base.Function;
 import com.monitorjbl.plugins.config.Config;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.concat;
@@ -31,8 +32,9 @@ public class PullRequestApproval {
   public Set<String> missingRevieiwers(PullRequest pr) {
     Map<String, PullRequestParticipant> map = transformReviewers(pr);
     Set<String> missingReviewers = newHashSet();
-    for (String req : concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups()))) {
-      if (!pr.getAuthor().getUser().getSlug().equals(req) && (!map.containsKey(req) || !map.get(req).isApproved())) {
+
+    for(String req : concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups()))) {
+      if(reviewerIsMissing(map.get(req)) && !(submitterIsRequiredReviewer(pr, req) && exactlyEnoughRequiredReviewers())) {
         missingReviewers.add(req);
       }
     }
@@ -50,5 +52,17 @@ public class PullRequestApproval {
         return input.getUser().getSlug();
       }
     });
+  }
+
+  Boolean reviewerIsMissing(PullRequestParticipant reviewer) {
+    return reviewer == null || !reviewer.isApproved();
+  }
+
+  Boolean submitterIsRequiredReviewer(PullRequest pr, String username) {
+    return pr.getAuthor().getUser().getSlug().equals(username);
+  }
+
+  Boolean exactlyEnoughRequiredReviewers() {
+    return Objects.equals(config.getRequiredReviewers().size(), config.getRequiredReviews());
   }
 }

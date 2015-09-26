@@ -115,9 +115,9 @@ public class PullRequestApprovalTest {
   }
 
   @Test
-  public void testMultipleApprovers_submitterIsApprover() {
+  public void testMultipleApprovers_submitterIsApprover_matchingNumberOfApprovers() {
     Set<PullRequestParticipant> p = newHashSet(
-        mockParticipant("user2", false)
+        mockParticipant("user2", true)
     );
     PullRequestParticipant author = mockParticipant("user1", false);
     when(pr.getReviewers()).thenReturn(p);
@@ -126,7 +126,39 @@ public class PullRequestApprovalTest {
         .requiredReviewers(newArrayList("user1", "user2"))
         .requiredReviews(2)
         .build(),
+        utils).isPullRequestApproved(pr), is(true));
+  }
+
+  @Test
+  public void testMultipleApprovers_submitterIsApprover_notEnoughApprovals() {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user2", true),
+        mockParticipant("user3", false)
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    assertThat(new PullRequestApproval(Config.builder()
+        .requiredReviewers(newArrayList("user1", "user2", "user3"))
+        .requiredReviews(2)
+        .build(),
         utils).isPullRequestApproved(pr), is(false));
+  }
+
+  @Test
+  public void testMultipleApprovers_submitterIsApprover_approved() {
+    Set<PullRequestParticipant> p = newHashSet(
+        mockParticipant("user2", true),
+        mockParticipant("user3", true)
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    assertThat(new PullRequestApproval(Config.builder()
+        .requiredReviewers(newArrayList("user1", "user2", "user3"))
+        .requiredReviews(2)
+        .build(),
+        utils).isPullRequestApproved(pr), is(true));
   }
 
   @Test
