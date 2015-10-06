@@ -2,7 +2,7 @@ package com.monitorjbl.plugins.config;
 
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.stash.user.UserService;
+import com.atlassian.bitbucket.user.UserService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;

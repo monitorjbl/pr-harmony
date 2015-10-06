@@ -3,14 +3,14 @@ package com.monitorjbl.plugins.config;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
-import com.atlassian.stash.project.Project;
-import com.atlassian.stash.project.ProjectService;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.repository.RepositoryService;
-import com.atlassian.stash.user.Permission;
-import com.atlassian.stash.user.PermissionService;
-import com.atlassian.stash.user.StashUser;
-import com.atlassian.stash.user.UserService;
+import com.atlassian.bitbucket.project.Project;
+import com.atlassian.bitbucket.project.ProjectService;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.repository.RepositoryService;
+import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.permission.PermissionService;
+import com.atlassian.bitbucket.user.ApplicationUser;
+import com.atlassian.bitbucket.user.UserService;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
@@ -77,8 +77,8 @@ public class ConfigServlet extends HttpServlet {
       return;
     }
 
-    StashUser stashUser = userService.getUserBySlug(username);
-    if (permissionService.hasRepositoryPermission(stashUser, repo, Permission.REPO_ADMIN)) {
+    ApplicationUser appUser = userService.getUserBySlug(username);
+    if (permissionService.hasRepositoryPermission(appUser, repo, Permission.REPO_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
       renderer.render("repo-config.html", ImmutableMap.<String, Object>of(
@@ -99,8 +99,8 @@ public class ConfigServlet extends HttpServlet {
       return;
     }
 
-    StashUser stashUser = userService.getUserBySlug(username);
-    if (permissionService.hasProjectPermission(stashUser, project, Permission.PROJECT_ADMIN)) {
+    ApplicationUser appUser = userService.getUserBySlug(username);
+    if (permissionService.hasProjectPermission(appUser, project, Permission.PROJECT_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
       renderer.render("project-config.html", ImmutableMap.<String, Object>of(

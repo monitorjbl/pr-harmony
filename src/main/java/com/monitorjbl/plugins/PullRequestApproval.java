@@ -1,7 +1,7 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.stash.pull.PullRequest;
-import com.atlassian.stash.pull.PullRequestParticipant;
+import com.atlassian.bitbucket.pull.PullRequest;
+import com.atlassian.bitbucket.pull.PullRequestParticipant;
 import com.google.common.base.Function;
 import com.monitorjbl.plugins.config.Config;
 

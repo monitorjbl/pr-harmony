@@ -1,8 +1,8 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.stash.user.StashUser;
-import com.atlassian.stash.user.UserService;
-import com.atlassian.stash.util.PageRequestImpl;
+import com.atlassian.bitbucket.user.ApplicationUser;
+import com.atlassian.bitbucket.user.UserService;
+import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.monitorjbl.plugins.config.User;
 
 import java.util.List;
@@ -19,21 +19,21 @@ public class UserUtils {
 
   public List<User> dereferenceUsers(Iterable<String> users) {
     List<User> list = newArrayList();
-    for (String u : users) {
+    for(String u : users) {
       list.add(getUserByName(u));
     }
     return list;
   }
 
   public User getUserByName(String username) {
-    StashUser user = userService.getUserBySlug(username);
+    ApplicationUser user = userService.getUserBySlug(username);
     return new User(user.getSlug(), user.getDisplayName());
   }
 
   public List<String> dereferenceGroups(List<String> groups) {
     List<String> users = newArrayList();
-    for (String group : groups) {
-      for (StashUser u : userService.findUsersByGroup(group, new PageRequestImpl(0, 25)).getValues()) {
+    for(String group : groups) {
+      for(ApplicationUser u : userService.findUsersByGroup(group, new PageRequestImpl(0, 25)).getValues()) {
         users.add(u.getSlug());
       }
     }

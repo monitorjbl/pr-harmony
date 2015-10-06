@@ -1,11 +1,9 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.stash.user.StashUser;
-import com.atlassian.stash.user.UserService;
-import com.atlassian.stash.util.Page;
-import com.atlassian.stash.util.PageRequest;
-import com.google.common.base.Predicate;
-import com.monitorjbl.plugins.config.User;
+import com.atlassian.bitbucket.user.ApplicationUser;
+import com.atlassian.bitbucket.user.UserService;
+import com.atlassian.bitbucket.util.Page;
+import com.atlassian.bitbucket.util.PageRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -15,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.monitorjbl.plugins.TestUtils.mockStashUser;
+import static com.monitorjbl.plugins.TestUtils.mockApplicationUser;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,16 +32,17 @@ public class UserUtilsTest {
   UserUtils sut;
 
   @Before
+  @SuppressWarnings("unchecked")
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
-    StashUser userA = mockStashUser("userA");
-    StashUser userB = mockStashUser("userB");
-    StashUser user1 = mockStashUser("user1");
-    StashUser user2 = mockStashUser("user2");
-    StashUser user3 = mockStashUser("user3");
-    StashUser user4 = mockStashUser("user4");
-    List<StashUser> userList1 = newArrayList(user1, user2);
-    List<StashUser> userList2 = newArrayList(user3, user4);
+    ApplicationUser userA = mockApplicationUser("userA");
+    ApplicationUser userB = mockApplicationUser("userB");
+    ApplicationUser user1 = mockApplicationUser("user1");
+    ApplicationUser user2 = mockApplicationUser("user2");
+    ApplicationUser user3 = mockApplicationUser("user3");
+    ApplicationUser user4 = mockApplicationUser("user4");
+    List<ApplicationUser> userList1 = newArrayList(user1, user2);
+    List<ApplicationUser> userList2 = newArrayList(user3, user4);
 
     Page p1 = mock(Page.class);
     Page p2 = mock(Page.class);

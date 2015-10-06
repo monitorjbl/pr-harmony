@@ -1,19 +1,19 @@
 package com.monitorjbl.plugins;
 
 import com.atlassian.event.api.EventListener;
-import com.atlassian.stash.commit.Commit;
-import com.atlassian.stash.event.pull.PullRequestApprovedEvent;
-import com.atlassian.stash.pull.PullRequest;
-import com.atlassian.stash.pull.PullRequestMergeRequest;
-import com.atlassian.stash.pull.PullRequestSearchRequest;
-import com.atlassian.stash.pull.PullRequestService;
-import com.atlassian.stash.pull.PullRequestState;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.user.Permission;
-import com.atlassian.stash.user.SecurityService;
-import com.atlassian.stash.util.Operation;
-import com.atlassian.stash.util.Page;
-import com.atlassian.stash.util.PageRequestImpl;
+import com.atlassian.bitbucket.commit.Commit;
+import com.atlassian.bitbucket.event.pull.PullRequestApprovedEvent;
+import com.atlassian.bitbucket.pull.PullRequest;
+import com.atlassian.bitbucket.pull.PullRequestMergeRequest;
+import com.atlassian.bitbucket.pull.PullRequestSearchRequest;
+import com.atlassian.bitbucket.pull.PullRequestService;
+import com.atlassian.bitbucket.pull.PullRequestState;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.user.SecurityService;
+import com.atlassian.bitbucket.util.Operation;
+import com.atlassian.bitbucket.util.Page;
+import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 

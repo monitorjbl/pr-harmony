@@ -1,7 +1,7 @@
 define('suggested-reviewers', [
   'jquery',
   'util/events',
-  'stash/api/util/state',
+  'bitbucket/api/util/state',
   'aui/flag',
   'exports'
 ], function ($, events, state, flag, exports) {
@@ -135,8 +135,8 @@ define('suggested-reviewers', [
         handleChange();
       });
     };
-    events.on("stash.model.page-state.changed.targetBranch", load);
-    events.on("stash.feature.compare.form.state", load);
+    events.on("bitbucket.model.page-state.changed.targetBranch", load);
+    events.on("bitbucket.feature.compare.form.state", load);
     $('#show-create-pr-button').click(load);
     selection.on("change", handleChange);
     load();

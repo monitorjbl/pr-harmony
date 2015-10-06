@@ -2,12 +2,12 @@ package com.monitorjbl.plugins.config;
 
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.repository.RepositoryService;
-import com.atlassian.stash.user.Permission;
-import com.atlassian.stash.user.PermissionService;
-import com.atlassian.stash.user.StashUser;
-import com.atlassian.stash.user.UserService;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.repository.RepositoryService;
+import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.permission.PermissionService;
+import com.atlassian.bitbucket.user.ApplicationUser;
+import com.atlassian.bitbucket.user.UserService;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class ConfigServletTest {
   @Mock
   HttpServletResponse response;
   @Mock
-  StashUser user;
+  ApplicationUser user;
   @Mock
   Repository repo;
 
@@ -67,7 +67,7 @@ public class ConfigServletTest {
 
   @Test
   public void testFoundRepo_differentContext() throws Exception {
-    sut.handleRequest("/stash/plugins/servlet/pr-harmony/PRJ/repo1", "user1", response);
+    sut.handleRequest("/bitbucket/plugins/servlet/pr-harmony/PRJ/repo1", "user1", response);
     verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
     verify(renderer, times(1)).render(anyString(), any(Map.class), any(Writer.class));
   }

@@ -1,21 +1,18 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.stash.event.pull.PullRequestOpenedEvent;
-import com.atlassian.stash.project.Project;
-import com.atlassian.stash.pull.PullRequest;
-import com.atlassian.stash.pull.PullRequestMergeRequest;
-import com.atlassian.stash.pull.PullRequestMergeability;
-import com.atlassian.stash.pull.PullRequestParticipant;
-import com.atlassian.stash.pull.PullRequestRef;
-import com.atlassian.stash.pull.PullRequestRole;
-import com.atlassian.stash.pull.PullRequestService;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.user.EscalatedSecurityContext;
-import com.atlassian.stash.user.Permission;
-import com.atlassian.stash.user.SecurityService;
-import com.atlassian.stash.util.Operation;
+import com.atlassian.bitbucket.event.pull.PullRequestOpenedEvent;
+import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.project.Project;
+import com.atlassian.bitbucket.pull.PullRequest;
+import com.atlassian.bitbucket.pull.PullRequestMergeRequest;
+import com.atlassian.bitbucket.pull.PullRequestMergeability;
+import com.atlassian.bitbucket.pull.PullRequestRef;
+import com.atlassian.bitbucket.pull.PullRequestService;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.user.EscalatedSecurityContext;
+import com.atlassian.bitbucket.user.SecurityService;
+import com.atlassian.bitbucket.util.Operation;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 import org.junit.Before;
@@ -28,12 +25,8 @@ import javax.annotation.Nonnull;
 import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
-import static com.monitorjbl.plugins.TestUtils.mockParticipant;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -148,10 +141,10 @@ public class PullRequestListenerTest {
       return null;
     }
 
-//    @Override
-//    public void applyToRequest() {
-//
-//    }
+    @Override
+    public void applyToRequest() {
+
+    }
 
     @Nonnull
     @Override

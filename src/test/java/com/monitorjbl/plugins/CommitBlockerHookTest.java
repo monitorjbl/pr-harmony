@@ -1,11 +1,12 @@
 package com.monitorjbl.plugins;
 
+import com.atlassian.bitbucket.hook.HookResponse;
+import com.atlassian.bitbucket.project.Project;
+import com.atlassian.bitbucket.repository.MinimalRef;
+import com.atlassian.bitbucket.repository.RefChange;
+import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
-import com.atlassian.stash.hook.HookResponse;
-import com.atlassian.stash.project.Project;
-import com.atlassian.stash.repository.RefChange;
-import com.atlassian.stash.repository.Repository;
 import com.google.common.collect.Lists;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
@@ -47,6 +48,8 @@ public class CommitBlockerHookTest {
   @Mock
   RefChange change;
   @Mock
+  MinimalRef ref;
+  @Mock
   HookResponse hookResponse;
   @Mock
   PrintWriter stderr;
@@ -65,11 +68,12 @@ public class CommitBlockerHookTest {
     when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
     when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
     when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
+    when(change.getRef()).thenReturn(ref);
   }
 
   @Test
   public void testCommit_blocked() throws Exception {
-    when(change.getRefId()).thenReturn("master");
+    when(ref.getId()).thenReturn("master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedCommits(newArrayList("master"))
         .build());
@@ -79,7 +83,7 @@ public class CommitBlockerHookTest {
 
   @Test
   public void testCommit_blockedWithExcludedUser() throws Exception {
-    when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
+    when(ref.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedCommits(newArrayList("master"))
         .excludedUsers(newArrayList("user1"))
@@ -90,7 +94,7 @@ public class CommitBlockerHookTest {
 
   @Test
   public void testCommit_blockedWithExcludedGroup() throws Exception {
-    when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
+    when(ref.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedCommits(newArrayList("master"))
         .excludedGroups(newArrayList("group1"))
@@ -103,7 +107,7 @@ public class CommitBlockerHookTest {
 
   @Test
   public void testCommit_notBlocked() throws Exception {
-    when(change.getRefId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
+    when(ref.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
         .blockedCommits(newArrayList("bugfix"))
         .build());

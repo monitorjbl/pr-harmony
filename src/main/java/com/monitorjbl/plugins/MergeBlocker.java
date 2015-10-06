@@ -1,9 +1,9 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.stash.pull.PullRequest;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.scm.pull.MergeRequest;
-import com.atlassian.stash.scm.pull.MergeRequestCheck;
+import com.atlassian.bitbucket.pull.PullRequest;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.scm.pull.MergeRequest;
+import com.atlassian.bitbucket.scm.pull.MergeRequestCheck;
 import com.google.common.base.Joiner;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;

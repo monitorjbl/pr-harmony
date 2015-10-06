@@ -2,10 +2,10 @@ package com.monitorjbl.plugins;
 
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
-import com.atlassian.stash.hook.HookResponse;
-import com.atlassian.stash.hook.PreReceiveHook;
-import com.atlassian.stash.repository.RefChange;
-import com.atlassian.stash.repository.Repository;
+import com.atlassian.bitbucket.hook.HookResponse;
+import com.atlassian.bitbucket.hook.PreReceiveHook;
+import com.atlassian.bitbucket.repository.RefChange;
+import com.atlassian.bitbucket.repository.Repository;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 
@@ -34,7 +34,7 @@ public class CommitBlockerHook implements PreReceiveHook {
 
     UserProfile user = userManager.getRemoteUser();
     for(RefChange ch : collection) {
-      String branch = regexUtils.formatBranchName(ch.getRefId());
+      String branch = regexUtils.formatBranchName(ch.getRef().getId());
       Set<String> excluded = newHashSet(concat(config.getExcludedUsers(), userUtils.dereferenceGroups(config.getExcludedGroups())));
       if(regexUtils.match(config.getBlockedCommits(), branch) && !excluded.contains(user.getUsername())) {
         hookResponse.err().write("\n" +

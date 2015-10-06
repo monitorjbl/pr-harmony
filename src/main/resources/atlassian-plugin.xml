@@ -8,16 +8,15 @@
   </plugin-info>
 
   <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
-  <component-import key="i18nService" interface="com.atlassian.stash.i18n.I18nService"/>
-  <component-import key="userService" interface="com.atlassian.stash.user.UserService"/>
-  <component-import key="repositoryService" interface="com.atlassian.stash.repository.RepositoryService"/>
-  <component-import key="permissionService" interface="com.atlassian.stash.user.PermissionService"/>
+  <component-import key="i18nService" interface="com.atlassian.bitbucket.i18n.I18nService"/>
+  <component-import key="userService" interface="com.atlassian.bitbucket.user.UserService"/>
+  <component-import key="repositoryService" interface="com.atlassian.bitbucket.repository.RepositoryService"/>
+  <component-import key="permissionService" interface="com.atlassian.bitbucket.permission.PermissionService"/>
   <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
   <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
   <component-import key="renderer"
                     interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer"/>
   <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
-  <component-import key="gitCommandBuilderFactory" interface="com.atlassian.stash.scm.git.GitCommandBuilderFactory"/>
 
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
   <component key="mergeBlocker" class="com.monitorjbl.plugins.MergeBlocker"/>
@@ -50,22 +49,21 @@
     <description>Provides REST resources for the config UI</description>
   </rest>
 
-  <stash-resource key="stash-suggest-reviewers-resources" name="PR Create Hook">
-    <context>stash.page.pullRequest.create</context>
+  <bitbucket-resource key="bitbucket-suggest-reviewers-resources" name="PR Create Hook">
+    <context>bitbucket.page.pullRequest.create</context>
     <resource type="download" name="pr-create-hook.js" location="pr-create-hook.js"/>
-    <dependency>com.atlassian.stash.stash-web-plugin:global</dependency>
+    <dependency>com.atlassian.bitbucket.server.bitbucket-web-plugin:global</dependency>
     <dependency>com.atlassian.auiplugin:aui-flag</dependency>
-  </stash-resource>
+  </bitbucket-resource>
 
-  <web-item key="pr-harmony-repo-config" weight="30"
-            section="stash.repository.settings.panel/repository-settings-addons-section">
+  <web-item key="pr-harmony-repo-config" weight="30" section="bitbucket.repository.settings.panel/repository-settings-addons-section">
     <label>PR Harmony</label>
     <link>/plugins/servlet/pr-harmony/${repository.project.key}/${repository.slug}</link>
     <tooltip>Advanced pull request options</tooltip>
   </web-item>
 
   <web-item key="pr-harmony-proj-config" weight="30"
-            section="stash.project.settings.panel/project-settings-addons-section">
+            section="bitbucket.project.settings.panel/project-settings-addons-section">
     <label>PR Harmony</label>
     <link>/plugins/servlet/pr-harmony/${project.key}</link>
     <tooltip>Advanced pull request options</tooltip>
