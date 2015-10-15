@@ -49,12 +49,12 @@
     <description>Provides REST resources for the config UI</description>
   </rest>
 
-  <bitbucket-resource key="bitbucket-suggest-reviewers-resources" name="PR Create Hook">
-    <context>bitbucket.page.pullRequest.create</context>
+  <web-resource key="bitbucket-suggest-reviewers-resources" name="PR Create Hook">
+    <context>bitbucket.page.compare</context>
     <resource type="download" name="pr-create-hook.js" location="pr-create-hook.js"/>
-    <dependency>com.atlassian.bitbucket.server.bitbucket-web-plugin:global</dependency>
+    <dependency>com.atlassian.bitbucket.server.bitbucket-web:global</dependency>
     <dependency>com.atlassian.auiplugin:aui-flag</dependency>
-  </bitbucket-resource>
+  </web-resource>
 
   <web-item key="pr-harmony-repo-config" weight="30" section="bitbucket.repository.settings.panel/repository-settings-addons-section">
     <label>PR Harmony</label>

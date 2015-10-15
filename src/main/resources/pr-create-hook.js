@@ -1,7 +1,9 @@
+console.log('HERE I AM');
+
 define('suggested-reviewers', [
   'jquery',
-  'util/events',
-  'bitbucket/api/util/state',
+  'bitbucket/util/events',
+  'bitbucket/util/state',
   'aui/flag',
   'exports'
 ], function ($, events, state, flag, exports) {
