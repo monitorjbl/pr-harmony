@@ -152,7 +152,7 @@ public class ConfigDao {
    * See: https://answers.atlassian.com/questions/32510704/should-pluginsettings.put-accept-blank-strings
    */
   String empty2null(String string) {
-    return string.isEmpty() ? null : string;
+    return string == null || string.isEmpty() ? null : string;
   }
 
   String toString(Integer integer) {
