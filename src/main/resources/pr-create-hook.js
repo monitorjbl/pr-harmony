@@ -116,7 +116,7 @@ define('suggested-reviewers', [
     var target = getTarget();
     AJS.log('Fetching required users');
     $.ajax({
-      url: root + '/rest/pr-harmony/1.0/users/' + target.project.key + '/' + target.name,
+      url: root + '/rest/pr-harmony/1.0/users/' + target.project.key + '/' + target.slug,
       dataType: "json",
       success: function (data) {
         AJS.log('Loaded required users');
