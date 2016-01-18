@@ -13,34 +13,41 @@
       return;
     }
 
+    var post = JSON.stringify({
+      requiredReviews: requiredReviews,
+      requiredReviewers: requiredReviewers,
+      requiredReviewerGroups: requiredReviewerGroups,
+      defaultReviewers: $('#defaultReviewers').val().split(','),
+      defaultReviewerGroups: $('#defaultReviewerGroups').val().split(','),
+      excludedUsers: $('#excludedUsers').val().split(','),
+      excludedGroups: $('#excludedGroups').val().split(','),
+      blockedCommits: $('#blockedCommits').val().split(','),
+      blockedPRs: $('#blockedPRs').val().split(','),
+      automergePRs: $('#automergePRs').val().split(','),
+      automergePRsFrom: $('#automergePRsFrom').val().split(',')
+    });
+    log('Uploading configuration', post);
+
     $.ajax({
       url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + (repoSlug || ''),
       type: "PUT",
       contentType: "application/json",
-      data: JSON.stringify({
-        requiredReviews: requiredReviews,
-        requiredReviewers: requiredReviewers,
-        requiredReviewerGroups: requiredReviewerGroups,
-        defaultReviewers: $('#defaultReviewers').val().split(','),
-        defaultReviewerGroups: $('#defaultReviewerGroups').val().split(','),
-        excludedUsers: $('#excludedUsers').val().split(','),
-        excludedGroups: $('#excludedGroups').val().split(','),
-        blockedCommits: $('#blockedCommits').val().split(','),
-        blockedPRs: $('#blockedPRs').val().split(','),
-        automergePRs: $('#automergePRs').val().split(','),
-        automergePRsFrom: $('#automergePRsFrom').val().split(',')
-      }),
+      data: post,
       success: function (config) {
+        log('Configuration uploaded, refreshing page');
         location.reload();
       }
     });
   }
 
   function getConfig() {
+    log('Loading configuration');
     $.ajax({
       url: baseUrl + "/rest/pr-harmony/1.0/config/" + projectKey + "/" + (repoSlug || ''),
       dataType: "json",
       success: function (config) {
+        log('Configuration loaded', config);
+
         $('#requiredReviews').val(config.requiredReviews);
         $('#requiredReviewers').val(config.requiredReviewers);
         $('#requiredReviewerGroups').val(config.requiredReviewerGroups);
@@ -136,6 +143,8 @@
     baseUrl = $("#baseUrl").val();
     projectKey = $("#projectKey").val();
     repoSlug = $("#repoSlug").val();
+
+    log('Using environment:', {baseUrl: baseUrl, projectKey: projectKey, repoSlug: repoSlug});
     $('#saveButton').click(function () {
       saveConfig();
     });
@@ -143,3 +152,8 @@
   });
 })(AJS.$);
 
+function log() {
+  var args = [].slice.apply(arguments);
+  args.unshift('[PR Harmony]:');
+  AJS.log.apply(this, args);
+}

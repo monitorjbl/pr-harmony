@@ -1,12 +1,14 @@
-console.log('HERE I AM');
+log('pr-create-hook.js');
 
-define('suggested-reviewers', [
+define('pr-harmony-create', [
   'jquery',
   'bitbucket/util/events',
   'bitbucket/util/state',
   'aui/flag',
   'exports'
 ], function ($, events, state, flag, exports) {
+
+  log('PR create hook initializing');
 
   var root = AJS.contextPath(),
       selection = $('.field-group.pull-request-reviewers #reviewers'),
@@ -20,6 +22,7 @@ define('suggested-reviewers', [
 
   function addUser(user) {
     if (user.slug != currentUser.slug) {
+      log('Adding user "' + user.slug + '" to reviewer list');
       var select2 = selection.data('select2');
       var reviewers = select2.data();
       reviewers.push({
@@ -31,6 +34,8 @@ define('suggested-reviewers', [
         }
       });
       select2.data(reviewers);
+    } else {
+      log('Not adding active user "' + user.slug + '" to reviewer list');
     }
   }
 
@@ -74,16 +79,17 @@ define('suggested-reviewers', [
 
   function handleChange() {
     if (isSubmitEnabled()) {
+      log('Disabling submit button');
       showFlag();
       $('#submit-form').prop('disabled', true);
     } else {
+      log('Enabling submit button');
       closeFlag();
       $('#submit-form').prop('disabled', false);
     }
   }
 
   function showFlag() {
-    AJS.log('Showing warning flag');
     var body = '<p>Your PR must have ' + config.requiredReviews + ' required reviewers on it. Please add ' +
         (config.requiredReviews - currentRequiredReviewers().length) + ' of the following:</p><ul>';
     var curr = currentReviewers();
@@ -95,8 +101,10 @@ define('suggested-reviewers', [
     body += '</ul>';
 
     if (warning) {
+      log('Warning tag visible already, replacing HTML body');
       $(warning).find('span.body').html(body);
     } else if (selection.is(":visible")) {
+      log('Showing warning flag');
       warning = flag({
         type: 'warning',
         title: 'Missing required reviewers',
@@ -108,7 +116,7 @@ define('suggested-reviewers', [
 
   function closeFlag() {
     if (warning) {
-      AJS.log('Hiding warning flag');
+      log('Hiding warning flag');
       warning.close();
       warning = undefined;
     }
@@ -116,19 +124,19 @@ define('suggested-reviewers', [
 
   function fetchConfig(callback) {
     var target = getTarget();
-    AJS.log('Fetching required users');
+    log('Fetching PR Harmony configuration for '+target.project.key+'/'+target.slug);
     $.ajax({
       url: root + '/rest/pr-harmony/1.0/users/' + target.project.key + '/' + target.slug,
       dataType: "json",
       success: function (data) {
-        AJS.log('Loaded required users');
+        log('Loaded config', data);
         config = data;
         if (typeof callback == 'function') {
           callback();
         }
       }
     });
-  };
+  }
 
   exports.init = function () {
     var load = function () {
@@ -147,6 +155,13 @@ define('suggested-reviewers', [
 
 AJS.$(document).ready(function ($) {
   return function () {
-    require("suggested-reviewers").init();
+    log('Reguiring PR create hook');
+    require("pr-harmony-create").init();
   };
 }(AJS.$));
+
+function log() {
+  var args = [].slice.apply(arguments);
+  args.unshift('[PR Harmony]:');
+  AJS.log.apply(this, args);
+}
