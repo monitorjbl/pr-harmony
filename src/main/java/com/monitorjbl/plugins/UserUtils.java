@@ -30,6 +30,10 @@ public class UserUtils {
     return new User(user.getSlug(), user.getDisplayName());
   }
 
+  public ApplicationUser getApplicationUserByName(String username) {
+    return userService.getUserByName(username);
+  }
+
   public List<String> dereferenceGroups(List<String> groups) {
     List<String> users = newArrayList();
     for(String group : groups) {

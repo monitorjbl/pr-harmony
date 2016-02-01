@@ -1,18 +1,18 @@
 package com.monitorjbl.plugins.config;
 
-import com.atlassian.sal.api.auth.LoginUriProvider;
-import com.atlassian.sal.api.user.UserManager;
-import com.atlassian.sal.api.user.UserProfile;
+import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.permission.PermissionService;
 import com.atlassian.bitbucket.project.Project;
 import com.atlassian.bitbucket.project.ProjectService;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.repository.RepositoryService;
-import com.atlassian.bitbucket.permission.Permission;
-import com.atlassian.bitbucket.permission.PermissionService;
 import com.atlassian.bitbucket.user.ApplicationUser;
-import com.atlassian.bitbucket.user.UserService;
+import com.atlassian.sal.api.auth.LoginUriProvider;
+import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.ImmutableMap;
+import com.monitorjbl.plugins.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +28,18 @@ public class ConfigServlet extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(ConfigServlet.class);
 
   private final UserManager userManager;
-  private final UserService userService;
+  private final UserUtils userUtils;
   private final RepositoryService repoService;
   private final ProjectService projectService;
   private final TemplateRenderer renderer;
   private final PermissionService permissionService;
   private final LoginUriProvider loginUriProvider;
 
-  public ConfigServlet(UserManager userManager, UserService userService, RepositoryService repoService,
+  public ConfigServlet(UserManager userManager, UserUtils userUtils, RepositoryService repoService,
                        ProjectService projectService, TemplateRenderer renderer, PermissionService permissionService,
                        LoginUriProvider loginUriProvider) {
     this.userManager = userManager;
-    this.userService = userService;
+    this.userUtils = userUtils;
     this.repoService = repoService;
     this.projectService = projectService;
     this.renderer = renderer;
@@ -50,7 +50,7 @@ public class ConfigServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     UserProfile user = userManager.getRemoteUser();
-    if (user == null) {
+    if(user == null) {
       response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
     } else {
       handleRequest(request.getRequestURI(), user.getUsername(), response);
@@ -59,9 +59,9 @@ public class ConfigServlet extends HttpServlet {
 
   void handleRequest(String requestPath, String username, HttpServletResponse response) throws IOException {
     String[] coords = requestPath.replaceAll(".*" + SERVLET_PATH, "").split("/");
-    if (coords.length == 1) {
+    if(coords.length == 1) {
       renderProjectSettings(coords[0], username, response);
-    } else if (coords.length == 2) {
+    } else if(coords.length == 2) {
       renderRepoSettings(coords[0], coords[1], username, response);
     } else {
       logger.warn("Malformed request path, expecting {}{projectKey}/{repoSlug}", SERVLET_PATH);
@@ -71,20 +71,20 @@ public class ConfigServlet extends HttpServlet {
 
   void renderRepoSettings(String projectKey, String repoSlug, String username, HttpServletResponse response) throws IOException {
     Repository repo = repoService.getBySlug(projectKey, repoSlug);
-    if (repo == null) {
+    if(repo == null) {
       logger.warn("Project/Repo [{}/{}] not found for user {}", projectKey, repoSlug, username);
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
 
-    ApplicationUser appUser = userService.getUserBySlug(username);
-    if (permissionService.hasRepositoryPermission(appUser, repo, Permission.REPO_ADMIN)) {
+    ApplicationUser appUser = userUtils.getApplicationUserByName(username);
+    if(permissionService.hasRepositoryPermission(appUser, repo, Permission.REPO_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
       renderer.render("repo-config.html", ImmutableMap.<String, Object>of(
           "projectKey", projectKey,
           "repositorySlug", repoSlug
-      ), response.getWriter());
+                                                                         ), response.getWriter());
     } else {
       logger.debug("Permission denied for user [{}]", username);
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -93,19 +93,19 @@ public class ConfigServlet extends HttpServlet {
 
   void renderProjectSettings(String projectKey, String username, HttpServletResponse response) throws IOException {
     Project project = projectService.getByKey(projectKey);
-    if (project == null) {
+    if(project == null) {
       logger.warn("Project [{}] not found for user {}", projectKey, username);
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
 
-    ApplicationUser appUser = userService.getUserBySlug(username);
-    if (permissionService.hasProjectPermission(appUser, project, Permission.PROJECT_ADMIN)) {
+    ApplicationUser appUser = userUtils.getApplicationUserByName(username);
+    if(permissionService.hasProjectPermission(appUser, project, Permission.PROJECT_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
       renderer.render("project-config.html", ImmutableMap.<String, Object>of(
           "projectKey", projectKey
-      ), response.getWriter());
+                                                                            ), response.getWriter());
     } else {
       logger.debug("Permission denied for user [{}]", username);
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -114,7 +114,7 @@ public class ConfigServlet extends HttpServlet {
 
   public URI getUri(HttpServletRequest request) {
     StringBuffer builder = request.getRequestURL();
-    if (request.getQueryString() != null) {
+    if(request.getQueryString() != null) {
       builder.append("?");
       builder.append(request.getQueryString());
     }
