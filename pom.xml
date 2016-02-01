@@ -8,6 +8,7 @@
   <version>1.8.2</version>
   <packaging>atlassian-plugin</packaging>
 
+
   <name>PR Harmony</name>
   <description>Provides additional pull request workflows for your team</description>
 
