@@ -110,16 +110,20 @@
       },
       ajax: {
         url: function (search) {
-          return baseUrl + "/projects/" + projectKey + "/permissions/groups/none?start=0&avatarSize=32&filter=" + search;
+          return baseUrl + "/projects/" + projectKey + "/permissions/groups?start=0&avatarSize=32&filter=" + search;
         },
         dataType: 'json',
         quietMillis: 250,
         results: function (data) {
           //format results to Select2 format by adding a unique id field
-          $.each(data.values, function () {
-            this.id = this.name;
-          });
-          return {results: data.values}
+          return {
+            results: $.map(data.values, function (val) {
+              return {
+                id: val.group.name,
+                name: val.group.name
+              };
+            })
+          }
         },
         cache: true
       },
