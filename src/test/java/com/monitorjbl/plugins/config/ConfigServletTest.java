@@ -1,14 +1,14 @@
 package com.monitorjbl.plugins.config;
 
-import com.atlassian.sal.api.auth.LoginUriProvider;
-import com.atlassian.sal.api.user.UserManager;
-import com.atlassian.bitbucket.repository.Repository;
-import com.atlassian.bitbucket.repository.RepositoryService;
 import com.atlassian.bitbucket.permission.Permission;
 import com.atlassian.bitbucket.permission.PermissionService;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.repository.RepositoryService;
 import com.atlassian.bitbucket.user.ApplicationUser;
-import com.atlassian.bitbucket.user.UserService;
+import com.atlassian.sal.api.auth.LoginUriProvider;
+import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.monitorjbl.plugins.UserUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -31,7 +31,7 @@ public class ConfigServletTest {
   @Mock
   private UserManager userManager;
   @Mock
-  private UserService userService;
+  private UserUtils userUtils;
   @Mock
   private RepositoryService repoService;
   @Mock
@@ -53,7 +53,7 @@ public class ConfigServletTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    when(userService.getUserBySlug("user1")).thenReturn(user);
+    when(userUtils.getApplicationUserByName("user1")).thenReturn(user);
     when(repoService.getBySlug("PRJ", "repo1")).thenReturn(repo);
     when(permissionService.hasRepositoryPermission(user, repo, Permission.REPO_ADMIN)).thenReturn(true);
   }
