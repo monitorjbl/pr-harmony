@@ -31,8 +31,8 @@ public class UserUtils {
   }
 
   public StashUser getApplicationUserByName(String username) {
-	    return userService.getUserByName(username);
-	  }
+    return userService.getUserByName(username);
+  }
 
   public List<String> dereferenceGroups(List<String> groups) {
     List<String> users = newArrayList();
