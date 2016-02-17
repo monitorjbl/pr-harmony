@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import com.monitorjbl.plugins.UserUtils;
+
 
 public class ConfigServlet extends HttpServlet {
   public static final String SERVLET_PATH = "/plugins/servlet/pr-harmony/";
@@ -29,16 +31,18 @@ public class ConfigServlet extends HttpServlet {
 
   private final UserManager userManager;
   private final UserService userService;
+  private final UserUtils userUtils;
   private final RepositoryService repoService;
   private final ProjectService projectService;
   private final TemplateRenderer renderer;
   private final PermissionService permissionService;
   private final LoginUriProvider loginUriProvider;
 
-  public ConfigServlet(UserManager userManager, UserService userService, RepositoryService repoService,
+  public ConfigServlet(UserManager userManager,UserUtils userUtils, UserService userService, RepositoryService repoService,
                        ProjectService projectService, TemplateRenderer renderer, PermissionService permissionService,
                        LoginUriProvider loginUriProvider) {
     this.userManager = userManager;
+    this.userUtils = userUtils;
     this.userService = userService;
     this.repoService = repoService;
     this.projectService = projectService;
@@ -77,7 +81,7 @@ public class ConfigServlet extends HttpServlet {
       return;
     }
 
-    StashUser stashUser = userService.getUserBySlug(username);
+    StashUser stashUser = userUtils.getApplicationUserByName(username);
     if (permissionService.hasRepositoryPermission(stashUser, repo, Permission.REPO_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");
@@ -99,7 +103,7 @@ public class ConfigServlet extends HttpServlet {
       return;
     }
 
-    StashUser stashUser = userService.getUserBySlug(username);
+    StashUser stashUser = userUtils.getApplicationUserByName(username);
     if (permissionService.hasProjectPermission(stashUser, project, Permission.PROJECT_ADMIN)) {
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("text/html;charset=utf-8");

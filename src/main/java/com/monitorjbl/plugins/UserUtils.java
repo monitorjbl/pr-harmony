@@ -26,9 +26,13 @@ public class UserUtils {
   }
 
   public User getUserByName(String username) {
-    StashUser user = userService.getUserBySlug(username);
+    StashUser user = userService.getUserByName(username);
     return new User(user.getSlug(), user.getDisplayName());
   }
+
+  public StashUser getApplicationUserByName(String username) {
+	    return userService.getUserByName(username);
+	  }
 
   public List<String> dereferenceGroups(List<String> groups) {
     List<String> users = newArrayList();

@@ -9,6 +9,8 @@ import com.atlassian.stash.user.PermissionService;
 import com.atlassian.stash.user.StashUser;
 import com.atlassian.stash.user.UserService;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.monitorjbl.plugins.UserUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -30,6 +32,8 @@ import static org.mockito.Mockito.when;
 public class ConfigServletTest {
   @Mock
   private UserManager userManager;
+  @Mock
+  private UserUtils userUtils;
   @Mock
   private UserService userService;
   @Mock
@@ -53,7 +57,7 @@ public class ConfigServletTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    when(userService.getUserBySlug("user1")).thenReturn(user);
+    when(userUtils.getApplicationUserByName("user1")).thenReturn(user);
     when(repoService.getBySlug("PRJ", "repo1")).thenReturn(repo);
     when(permissionService.hasRepositoryPermission(user, repo, Permission.REPO_ADMIN)).thenReturn(true);
   }
