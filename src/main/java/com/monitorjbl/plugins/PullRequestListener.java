@@ -1,19 +1,19 @@
 package com.monitorjbl.plugins;
 
-import com.atlassian.event.api.EventListener;
 import com.atlassian.bitbucket.commit.Commit;
-import com.atlassian.bitbucket.event.pull.PullRequestApprovedEvent;
+import com.atlassian.bitbucket.event.pull.PullRequestParticipantStatusUpdatedEvent;
+import com.atlassian.bitbucket.permission.Permission;
 import com.atlassian.bitbucket.pull.PullRequest;
 import com.atlassian.bitbucket.pull.PullRequestMergeRequest;
 import com.atlassian.bitbucket.pull.PullRequestSearchRequest;
 import com.atlassian.bitbucket.pull.PullRequestService;
 import com.atlassian.bitbucket.pull.PullRequestState;
 import com.atlassian.bitbucket.repository.Repository;
-import com.atlassian.bitbucket.permission.Permission;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Operation;
 import com.atlassian.bitbucket.util.Page;
 import com.atlassian.bitbucket.util.PageRequestImpl;
+import com.atlassian.event.api.EventListener;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 
@@ -37,7 +37,7 @@ public class PullRequestListener {
   }
 
   @EventListener
-  public void prApprovalListener(PullRequestApprovedEvent event) {
+  public void prApprovalListener(PullRequestParticipantStatusUpdatedEvent event) {
     automergePullRequest(event.getPullRequest());
   }
 
@@ -55,7 +55,7 @@ public class PullRequestListener {
     String toBranch = regexUtils.formatBranchName(pr.getToRef().getId());
     String fromBranch = regexUtils.formatBranchName(pr.getFromRef().getId());
 
-    if ((regexUtils.match(config.getAutomergePRs(), toBranch) || regexUtils.match(config.getAutomergePRsFrom(), fromBranch)) &&
+    if((regexUtils.match(config.getAutomergePRs(), toBranch) || regexUtils.match(config.getAutomergePRsFrom(), fromBranch)) &&
         !regexUtils.match(config.getBlockedPRs(), toBranch) && prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
       securityService.withPermission(Permission.ADMIN, "Automerging pull request").call(new Operation<Object, RuntimeException>() {
         public Object perform() throws RuntimeException {
@@ -68,14 +68,14 @@ public class PullRequestListener {
   PullRequest findPRByCommitId(String commitId) {
     int start = 0;
     Page<PullRequest> requests = null;
-    while (requests == null || requests.getSize() > 0) {
+    while(requests == null || requests.getSize() > 0) {
       requests = prService.search(new PullRequestSearchRequest.Builder()
           .state(PullRequestState.OPEN)
           .build(), new PageRequestImpl(start, 10));
-      for (PullRequest pr : requests.getValues()) {
+      for(PullRequest pr : requests.getValues()) {
         Page<Commit> commits = prService.getCommits(pr.getToRef().getRepository().getId(), pr.getId(), new PageRequestImpl(0, MAX_COMMITS));
-        for (Commit c : commits.getValues()) {
-          if (c.getId().equals(commitId)) {
+        for(Commit c : commits.getValues()) {
+          if(c.getId().equals(commitId)) {
             return pr;
           }
         }
