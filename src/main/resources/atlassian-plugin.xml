@@ -49,9 +49,16 @@
     <description>Provides REST resources for the config UI</description>
   </rest>
 
-  <web-resource key="bitbucket-suggest-reviewers-resources" name="PR Create Hook">
+  <web-resource key="bitbucket-pr-reviewers-resources" name="PR Create Hook">
     <context>bitbucket.page.compare</context>
     <resource type="download" name="pr-create-hook.js" location="pr-create-hook.js"/>
+    <dependency>com.atlassian.bitbucket.server.bitbucket-web:global</dependency>
+    <dependency>com.atlassian.auiplugin:aui-flag</dependency>
+  </web-resource>
+
+  <web-resource key="bitbucket-pr-refresh-resources" name="PR Refresh Hook">
+    <context>bitbucket.page.pullRequest.view</context>
+    <resource type="download" name="pr-refresh-hook.js" location="pr-refresh-hook.js"/>
     <dependency>com.atlassian.bitbucket.server.bitbucket-web:global</dependency>
     <dependency>com.atlassian.auiplugin:aui-flag</dependency>
   </web-resource>
