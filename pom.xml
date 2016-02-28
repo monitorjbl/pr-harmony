@@ -44,16 +44,11 @@
       <artifactId>sal-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>com.atlassian.stash</groupId>-->
-    <!--<artifactId>stash-build-integration</artifactId>-->
-    <!--<scope>provided</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>com.atlassian.stash</groupId>-->
-    <!--<artifactId>stash-page-objects</artifactId>-->
-    <!--<scope>provided</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.atlassian.bitbucket.server</groupId>
+      <artifactId>bitbucket-build-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>com.atlassian.templaterenderer</groupId>
       <artifactId>atlassian-template-renderer-api</artifactId>

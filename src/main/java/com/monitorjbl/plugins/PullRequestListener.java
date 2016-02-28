@@ -1,5 +1,6 @@
 package com.monitorjbl.plugins;
 
+import com.atlassian.bitbucket.build.BuildStatusSetEvent;
 import com.atlassian.bitbucket.commit.Commit;
 import com.atlassian.bitbucket.event.pull.PullRequestParticipantStatusUpdatedEvent;
 import com.atlassian.bitbucket.permission.Permission;
@@ -10,27 +11,22 @@ import com.atlassian.bitbucket.pull.PullRequestService;
 import com.atlassian.bitbucket.pull.PullRequestState;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.user.SecurityService;
-import com.atlassian.bitbucket.util.Operation;
 import com.atlassian.bitbucket.util.Page;
 import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.atlassian.event.api.EventListener;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 
-//import com.atlassian.stash.build.BuildStatusSetEvent;
-
 public class PullRequestListener {
   public static final int MAX_COMMITS = 1048576;
 
   private final ConfigDao configDao;
-  private final UserUtils utils;
   private final PullRequestService prService;
   private final SecurityService securityService;
   private final RegexUtils regexUtils;
 
-  public PullRequestListener(ConfigDao configDao, UserUtils utils, PullRequestService prService, SecurityService securityService, RegexUtils regexUtils) {
+  public PullRequestListener(ConfigDao configDao, PullRequestService prService, SecurityService securityService, RegexUtils regexUtils) {
     this.configDao = configDao;
-    this.utils = utils;
     this.prService = prService;
     this.securityService = securityService;
     this.regexUtils = regexUtils;
@@ -41,13 +37,13 @@ public class PullRequestListener {
     automergePullRequest(event.getPullRequest());
   }
 
-//  @EventListener
-//  public void buildStatusListener(BuildStatusSetEvent event) {
-//    PullRequest pr = findPRByCommitId(event.getCommitId());
-//    if (pr != null) {
-//      automergePullRequest(pr);
-//    }
-//  }
+  @EventListener
+  public void buildStatusListener(BuildStatusSetEvent event) {
+    PullRequest pr = findPRByCommitId(event.getCommitId());
+    if(pr != null) {
+      automergePullRequest(pr);
+    }
+  }
 
   void automergePullRequest(final PullRequest pr) {
     Repository repo = pr.getToRef().getRepository();
@@ -57,11 +53,7 @@ public class PullRequestListener {
 
     if((regexUtils.match(config.getAutomergePRs(), toBranch) || regexUtils.match(config.getAutomergePRsFrom(), fromBranch)) &&
         !regexUtils.match(config.getBlockedPRs(), toBranch) && prService.canMerge(repo.getId(), pr.getId()).canMerge()) {
-      securityService.withPermission(Permission.ADMIN, "Automerging pull request").call(new Operation<Object, RuntimeException>() {
-        public Object perform() throws RuntimeException {
-          return prService.merge(new PullRequestMergeRequest.Builder(pr).build());
-        }
-      });
+      securityService.withPermission(Permission.ADMIN, "Automerging pull request").call(() -> prService.merge(new PullRequestMergeRequest.Builder(pr).build()));
     }
   }
 
