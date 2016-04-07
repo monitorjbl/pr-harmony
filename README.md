@@ -1,4 +1,4 @@
-[![shippable](https://api.shippable.com/projects/55cfbb00edd7f2c052a980ac/badge/master)](https://app.shippable.com/projects/55cfbb00edd7f2c052a980ac)
+[![Run Status](https://api.shippable.com/projects/55cfbb00edd7f2c052a980ac/badge?branch=master)](https://app.shippable.com/projects/55cfbb00edd7f2c052a980ac)
 
 # PR Harmony
 
