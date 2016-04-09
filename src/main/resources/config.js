@@ -105,7 +105,7 @@
     });
   }
 
-  function groupSelection(ele) {
+  function groupSelection(ele, scope) {
     $(ele).auiSelect2({
       placeholder: "Search for a group",
       minimumInputLength: 2,
@@ -117,17 +117,18 @@
       },
       ajax: {
         url: function (search) {
-          return baseUrl + "/projects/" + projectKey + "/permissions/groups?start=0&avatarSize=32&filter=" + search;
+          return 'http://localhost:7990/bitbucket/rest/api/1.0/groups?filter=' + search;
         },
         dataType: 'json',
         quietMillis: 250,
         results: function (data) {
           //format results to Select2 format by adding a unique id field
+          log(data);
           return {
             results: $.map(data.values, function (val) {
               return {
-                id: val.group.name,
-                name: val.group.name
+                id: val,
+                name: val
               };
             })
           }
