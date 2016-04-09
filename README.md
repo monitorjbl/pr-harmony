@@ -33,7 +33,7 @@ These options allow more Gerrit-style voting workflows within Stash.
 
 # Building
 
-Requires Java 7+ and Maven 3.2+
+Requires Java 8+ and Maven 3.2+
 
 ```
 git clone https://github.com/monitorjbl/pr-harmony.git
