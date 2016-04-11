@@ -117,7 +117,7 @@
       },
       ajax: {
         url: function (search) {
-          return 'http://localhost:7990/bitbucket/rest/api/1.0/groups?filter=' + search;
+          return baseUrl + '/rest/api/1.0/groups?filter=' + search;
         },
         dataType: 'json',
         quietMillis: 250,
