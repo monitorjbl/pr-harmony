@@ -27,7 +27,7 @@ public class UserUtils {
 
   public User getUserByName(String username) {
     ApplicationUser user = userService.getUserByName(username);
-    return new User(user.getSlug(), user.getDisplayName());
+    return new User(user.getName(), user.getDisplayName());
   }
 
   public ApplicationUser getApplicationUserByName(String username) {
