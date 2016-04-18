@@ -5,6 +5,7 @@
     <vendor name="${project.organization.name}" url="${project.organization.url}"/>
     <param name="plugin-icon">images/pluginIcon.png</param>
     <param name="plugin-logo">images/pluginIcon.png</param>
+    <param name="atlassian-data-center-compatible">true</param>
   </plugin-info>
 
   <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
