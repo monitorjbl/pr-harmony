@@ -37,7 +37,7 @@ public class UserUtils {
   public List<String> dereferenceGroups(List<String> groups) {
     List<String> users = newArrayList();
     for(String group : groups) {
-      for(ApplicationUser u : userService.findUsersByGroup(group, new PageRequestImpl(0, 25)).getValues()) {
+      for(ApplicationUser u : userService.findUsersByGroup(group, new PageRequestImpl(0, 1000)).getValues()) {
         users.add(u.getSlug());
       }
     }
