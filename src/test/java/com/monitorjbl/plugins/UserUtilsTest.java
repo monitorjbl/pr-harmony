@@ -9,18 +9,19 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.stubbing.Answer;
 
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.monitorjbl.plugins.TestUtils.mockApplicationUser;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,10 +47,23 @@ public class UserUtilsTest {
 
     Page p1 = mock(Page.class);
     Page p2 = mock(Page.class);
+    Page empty = mock(Page.class);
     when(p1.getValues()).thenReturn(userList1);
     when(p2.getValues()).thenReturn(userList2);
-    when(userService.findUsersByGroup(eq("group1"), any(PageRequest.class))).thenReturn(p1);
-    when(userService.findUsersByGroup(eq("group2"), any(PageRequest.class))).thenReturn(p2);
+    when(empty.getValues()).thenReturn(emptyList());
+    when(userService.findUsersByGroup(any(String.class), any(PageRequest.class))).then((Answer<Page>) invocation -> {
+      String group = (String) invocation.getArguments()[0];
+      PageRequest pageRequest = (PageRequest) invocation.getArguments()[1];
+
+      if("group1".equals(group) && pageRequest.getStart() == 0) {
+        return p1;
+      } else if("group2".equals(group) && pageRequest.getStart() == 0) {
+        return p2;
+      } else {
+        return empty;
+      }
+    });
+
     when(userService.getUserBySlug("userA")).thenReturn(userA);
     when(userService.getUserBySlug("userB")).thenReturn(userB);
     when(userService.getUserBySlug("user1")).thenReturn(user1);
