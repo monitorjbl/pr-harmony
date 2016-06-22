@@ -6,11 +6,12 @@ import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.monitorjbl.plugins.config.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 
 public class UserUtils {
-
+  private static final int RESULTS_PER_REQUEST = 25;
   private final UserService userService;
 
   public UserUtils(UserService userService) {
@@ -37,8 +38,12 @@ public class UserUtils {
   public List<String> dereferenceGroups(List<String> groups) {
     List<String> users = newArrayList();
     for(String group : groups) {
-      for(ApplicationUser u : userService.findUsersByGroup(group, new PageRequestImpl(0, 25)).getValues()) {
-        users.add(u.getSlug());
+      List<ApplicationUser> results = newArrayList(userService.findUsersByGroup(group, new PageRequestImpl(0, RESULTS_PER_REQUEST)).getValues());
+      for(int i = 1; results.size() > 0; i++) {
+        users.addAll(results.stream()
+            .map(ApplicationUser::getSlug)
+            .collect(Collectors.toList()));
+        results = newArrayList(userService.findUsersByGroup(group, new PageRequestImpl(i * RESULTS_PER_REQUEST, RESULTS_PER_REQUEST)).getValues());
       }
     }
     return users;
