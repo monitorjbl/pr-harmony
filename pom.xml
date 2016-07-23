@@ -149,8 +149,8 @@
   </build>
 
   <properties>
-    <bitbucket.version>4.2.0</bitbucket.version>
-    <bitbucket.data.version>4.2.0</bitbucket.data.version>
+    <bitbucket.version>4.4.0</bitbucket.version>
+    <bitbucket.data.version>4.4.0</bitbucket.data.version>
     <amps.version>6.1.0</amps.version>
     <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

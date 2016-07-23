@@ -3,7 +3,7 @@
 
   function saveConfig() {
     var requiredReviews = parseInt($('#requiredReviews').val());
-    var blockMergeIfPrNeedsWork = parseBoolean($('#blockMergeIfPrNeedsWork').val());
+    var blockMergeIfPrNeedsWork = $('#blockMergeIfPrNeedsWork')[0].checked;
     var requiredReviewers = $.grep($('#requiredReviewers').val().split(','), function (v) {return v != ''});
     var requiredReviewerGroups = $.grep($('#requiredReviewerGroups').val().split(','), function (v) {return v != ''});
 
@@ -51,7 +51,7 @@
         log('Configuration loaded', config);
 
         $('#requiredReviews').val(config.requiredReviews);
-        $('#blockMergeIfPrNeedsWork').val(config.blockMergeIfPrNeedsWork);
+        $('#blockMergeIfPrNeedsWork').prop('checked',config.blockMergeIfPrNeedsWork);
         $('#requiredReviewers').val(config.requiredReviewers);
         $('#requiredReviewerGroups').val(config.requiredReviewerGroups);
         $('#defaultReviewers').val(config.defaultReviewers);
