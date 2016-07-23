@@ -6,6 +6,7 @@ import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.monitorjbl.plugins.config.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -21,14 +22,17 @@ public class UserUtils {
   public List<User> dereferenceUsers(Iterable<String> users) {
     List<User> list = newArrayList();
     for(String u : users) {
-      list.add(getUserByName(u));
+      Optional<User> user = getUserByName(u);
+      if(user.isPresent()) {
+        list.add(user.get());
+      }
     }
     return list;
   }
 
-  public User getUserByName(String username) {
+  public Optional<User> getUserByName(String username) {
     ApplicationUser user = userService.getUserByName(username);
-    return new User(user.getName(), user.getDisplayName());
+    return user == null ? Optional.empty() : Optional.of(new User(user.getName(), user.getDisplayName()));
   }
 
   public ApplicationUser getApplicationUserByName(String username) {
