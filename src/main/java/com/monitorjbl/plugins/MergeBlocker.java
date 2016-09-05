@@ -34,9 +34,9 @@ public class MergeBlocker implements MergeRequestCheck {
     } else {
       PullRequestApproval approval = new PullRequestApproval(config, userUtils);
       if (!approval.isPullRequestApproved(pr)) {
-        Set<String> missing = approval.missingRevieiwers(pr);
+        Set<String> missing = approval.missingRevieiwersNames(pr);
         mergeRequest.veto("Required reviewers must approve", (config.getRequiredReviews() - approval.seenReviewers(pr).size()) +
-            " more approvals required from the following users: " + Joiner.on(',').join(missing));
+            " more approvals required from the following users: " + Joiner.on(", ").join(missing));
       }
     }
   }
