@@ -41,6 +41,18 @@ public class PullRequestApproval {
     return missingReviewers;
   }
 
+  public Set<String> missingRevieiwersNames(PullRequest pr) {
+    Map<String, PullRequestParticipant> map = transformReviewers(pr);
+    Set<String> missingReviewers = newHashSet();
+    
+    for(String req : concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups()))) {
+       if(reviewerIsMissing(map.get(req)) && !(submitterIsRequiredReviewer(pr, req) && exactlyEnoughRequiredReviewers())) {
+	      missingReviewers.add(utils.getUserDisplayNameByName(req));
+	   }
+	}
+	return missingReviewers;
+  }
+  
   public Set<String> seenReviewers(PullRequest pr) {
     Set<String> required = newHashSet(concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups())));
     return difference(required, missingRevieiwers(pr));

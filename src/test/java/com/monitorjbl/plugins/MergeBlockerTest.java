@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Set;
@@ -63,6 +64,8 @@ public class MergeBlockerTest {
     when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
     when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
     when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
+    when(userUtils.getUserDisplayNameByName(Mockito.eq("user1"))).thenReturn("First user");
+    when(userUtils.getUserDisplayNameByName(Mockito.eq("user2"))).thenReturn("Second user");
   }
 
   @Test

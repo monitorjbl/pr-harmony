@@ -35,6 +35,11 @@ public class UserUtils {
     return user == null ? Optional.empty() : Optional.of(new User(user.getName(), user.getDisplayName()));
   }
 
+  public String getUserDisplayNameByName(String username) {
+	    ApplicationUser user = userService.getUserByName(username);  
+	    return user.getDisplayName() == null ? username : user.getDisplayName();
+  }
+  
   public ApplicationUser getApplicationUserByName(String username) {
     return userService.getUserByName(username);
   }
