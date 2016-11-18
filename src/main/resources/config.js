@@ -3,6 +3,7 @@
 
   function saveConfig() {
     var requiredReviews = parseInt($('#requiredReviews').val());
+    var blockMergeIfPrNeedsWork = parseBoolean($('#blockMergeIfPrNeedsWork').val());
     var requiredReviewers = $.grep($('#requiredReviewers').val().split(','), function (v) {return v != ''});
     var requiredReviewerGroups = $.grep($('#requiredReviewerGroups').val().split(','), function (v) {return v != ''});
 
@@ -15,6 +16,7 @@
 
     var post = JSON.stringify({
       requiredReviews: requiredReviews,
+      blockMergeIfPrNeedsWork: blockMergeIfPrNeedsWork,
       requiredReviewers: requiredReviewers,
       requiredReviewerGroups: requiredReviewerGroups,
       defaultReviewers: $('#defaultReviewers').val().split(','),
@@ -49,6 +51,7 @@
         log('Configuration loaded', config);
 
         $('#requiredReviews').val(config.requiredReviews);
+        $('#blockMergeIfPrNeedsWork').val(config.blockMergeIfPrNeedsWork);
         $('#requiredReviewers').val(config.requiredReviewers);
         $('#requiredReviewerGroups').val(config.requiredReviewerGroups);
         $('#defaultReviewers').val(config.defaultReviewers);

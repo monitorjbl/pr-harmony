@@ -1,6 +1,8 @@
 package com.monitorjbl.plugins;
 
 import com.atlassian.bitbucket.pull.PullRequest;
+import com.atlassian.bitbucket.pull.PullRequestParticipant;
+import com.atlassian.bitbucket.pull.PullRequestParticipantStatus;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.scm.pull.MergeRequest;
 import com.atlassian.bitbucket.scm.pull.MergeRequestCheck;
@@ -37,8 +39,26 @@ public class MergeBlocker implements MergeRequestCheck {
         Set<String> missing = approval.missingRevieiwersNames(pr);
         mergeRequest.veto("Required reviewers must approve", (config.getRequiredReviews() - approval.seenReviewers(pr).size()) +
             " more approvals required from the following users: " + Joiner.on(", ").join(missing));
+      } else {
+        final Boolean blockAutoMergeBecausePrNeedsWork = config.getBlockMergeIfPrNeedsWork() && needsWork(pr);
+
+        if (blockAutoMergeBecausePrNeedsWork) {
+          mergeRequest.veto("PR marked as Needs Work from reviewer(s)", "Resolve it before merge.");
+        }
       }
     }
   }
 
+  private boolean needsWork(final PullRequest pr) {
+    boolean needsWork = false;
+
+    for (PullRequestParticipant reviewer : pr.getParticipants()) {
+      if (reviewer.getStatus() == PullRequestParticipantStatus.NEEDS_WORK) {
+        needsWork = true;
+        break;
+      }
+    }
+
+    return needsWork;
+  }
 }

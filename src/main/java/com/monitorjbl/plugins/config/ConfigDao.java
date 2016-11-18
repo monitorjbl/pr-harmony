@@ -15,6 +15,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 public class ConfigDao {
   public static final String REQUIRED_REVIEWS = "requiredReviews";
+  public static final String BLOCK_MERGE_IF_PR_NEEDS_WORK = "blockMergeIfPrNeedsWork";
   public static final String REQUIRED_REVIWERS = "requiredReviewers";
   public static final String REQUIRED_REVIWER_GROUPS = "requiredReviewerGroups";
   public static final String DEFAULT_REVIEWERS = "defaultReviewers";
@@ -54,6 +55,7 @@ public class ConfigDao {
   Config readConfig(PluginSettings settings) {
     return Config.builder()
         .requiredReviews(parseInt(get(settings, REQUIRED_REVIEWS, null)))
+        .blockMergeIfPrNeedsWork(parseBoolean(get(settings, BLOCK_MERGE_IF_PR_NEEDS_WORK, null)))
         .requiredReviewers(split(get(settings, REQUIRED_REVIWERS, "")))
         .requiredReviewerGroups(split(get(settings, REQUIRED_REVIWER_GROUPS, "")))
         .defaultReviewers(split(get(settings, DEFAULT_REVIEWERS, "")))
@@ -70,6 +72,7 @@ public class ConfigDao {
   @SuppressWarnings("unchecked")
   void writeConfig(PluginSettings settings, Config config) {
     settings.put(REQUIRED_REVIEWS, toString(config.getRequiredReviews()));
+    settings.put(BLOCK_MERGE_IF_PR_NEEDS_WORK, toString(config.getBlockMergeIfPrNeedsWork()));
     settings.put(REQUIRED_REVIWERS, empty2null(join(config.getRequiredReviewers(), new FilterInvalidUsers())));
     settings.put(REQUIRED_REVIWER_GROUPS, empty2null(join(config.getRequiredReviewerGroups(), new FilterInvalidGroups())));
     settings.put(DEFAULT_REVIEWERS, empty2null(join(config.getDefaultReviewers(), new FilterInvalidUsers())));
@@ -90,6 +93,7 @@ public class ConfigDao {
   Config overlayConfig(Config bottom, Config top) {
     return Config.builder()
         .requiredReviews(top.getRequiredReviews() != null ? top.getRequiredReviews() : bottom.getRequiredReviews())
+        .blockMergeIfPrNeedsWork(top.getBlockMergeIfPrNeedsWork() != null ? top.getBlockMergeIfPrNeedsWork() : bottom.getBlockMergeIfPrNeedsWork())
         .requiredReviewers(overlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
         .requiredReviewerGroups(overlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
         .defaultReviewers(overlay(bottom.getDefaultReviewers(), top.getDefaultReviewers()))
@@ -111,6 +115,7 @@ public class ConfigDao {
   Config reverseOverlayConfig(Config bottom, Config top) {
     return Config.builder()
         .requiredReviews(Objects.equals(top.getRequiredReviews(), bottom.getRequiredReviews()) ? null : top.getRequiredReviews())
+        .blockMergeIfPrNeedsWork(Objects.equals(top.getBlockMergeIfPrNeedsWork(), bottom.getBlockMergeIfPrNeedsWork()) ? null : top.getBlockMergeIfPrNeedsWork())
         .requiredReviewers(reverseOverlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
         .requiredReviewerGroups(reverseOverlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
         .defaultReviewers(reverseOverlay(bottom.getDefaultReviewers(), top.getDefaultReviewers()))
@@ -145,6 +150,10 @@ public class ConfigDao {
     return str == null ? null : Integer.parseInt(str);
   }
 
+  Boolean parseBoolean(String str) {
+    return str == null ? null : Boolean.parseBoolean(str);
+  }
+
   /**
    * Force empty strings to NULL. In SAL prior to v3.0.5, empty strings behaved as
    * NULL and removed the item from the settings.  In v3.05, empty strings now cause 
@@ -157,6 +166,10 @@ public class ConfigDao {
 
   String toString(Integer integer) {
     return integer == null ? null : Integer.toString(integer);
+  }
+
+  String toString(Boolean b) {
+    return b == null ? null : Boolean.toString(b);
   }
 
   PluginSettings repoSettings(String projectKey, String repoSlug) {

@@ -15,6 +15,7 @@ public class Config {
   private List<String> requiredReviewers = newArrayList();
   private List<String> requiredReviewerGroups = newArrayList();
   private Integer requiredReviews = 0;
+  private Boolean blockMergeIfPrNeedsWork = false;
   private List<String> blockedCommits = newArrayList();
   private List<String> blockedPRs = newArrayList();
   private List<String> automergePRs = newArrayList();
@@ -31,6 +32,7 @@ public class Config {
     setRequiredReviewers(builder.requiredReviewers);
     setRequiredReviewerGroups(builder.requiredReviewerGroups);
     setRequiredReviews(builder.requiredReviews);
+    setBlockMergeIfPrNeedsWork(builder.blockMergeIfPrNeedsWork);
     setBlockedCommits(builder.blockedCommits);
     setBlockedPRs(builder.blockedPRs);
     setAutomergePRs(builder.automergePRs);
@@ -77,6 +79,14 @@ public class Config {
 
   public void setRequiredReviews(Integer requiredReviews) {
     this.requiredReviews = requiredReviews;
+  }
+
+  public Boolean getBlockMergeIfPrNeedsWork() {
+    return blockMergeIfPrNeedsWork;
+  }
+
+  public void setBlockMergeIfPrNeedsWork(Boolean blockMergeIfPrNeedsWork) {
+    this.blockMergeIfPrNeedsWork = blockMergeIfPrNeedsWork;
   }
 
   public List<String> getBlockedCommits() {
@@ -141,6 +151,7 @@ public class Config {
     private List<String> requiredReviewers = newArrayList();
     private List<String> requiredReviewerGroups = newArrayList();
     private Integer requiredReviews = 0;
+    private Boolean blockMergeIfPrNeedsWork = false;;
     private List<String> blockedCommits = newArrayList();
     private List<String> blockedPRs = newArrayList();
     private List<String> automergePRs = newArrayList();
@@ -161,6 +172,7 @@ public class Config {
       blockedPRs = newArrayList(copy.blockedPRs);
       automergePRs = newArrayList(copy.automergePRs);
       automergePRsFrom = newArrayList(copy.automergePRsFrom);
+      blockMergeIfPrNeedsWork = copy.blockMergeIfPrNeedsWork;
       excludedUsers = newArrayList(copy.excludedUsers);
       excludedGroups = newArrayList(copy.excludedGroups);
     }
@@ -187,6 +199,11 @@ public class Config {
 
     public Builder requiredReviews(Integer requiredReviews) {
       this.requiredReviews = requiredReviews;
+      return this;
+    }
+
+    public Builder blockMergeIfPrNeedsWork(Boolean blockMergeIfPrNeedsWork) {
+      this.blockMergeIfPrNeedsWork = blockMergeIfPrNeedsWork;
       return this;
     }
 
