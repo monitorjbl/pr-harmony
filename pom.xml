@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.monitorjbl.plugins</groupId>
   <artifactId>pr-harmony</artifactId>
-  <version>2.3.1</version>
+  <version>2.3.3</version>
   <packaging>atlassian-plugin</packaging>
 
   <name>PR Harmony</name>
