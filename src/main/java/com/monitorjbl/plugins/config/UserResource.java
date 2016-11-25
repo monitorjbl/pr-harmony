@@ -30,6 +30,7 @@ public class UserResource {
     Config config = configDao.getConfigForRepo(projectKey, repoSlug);
     return Response.ok(ImmutableMap.of(
         "requiredReviews", config.getRequiredReviews() == null ? "" : config.getRequiredReviews(),
+        "blockMergeIfPrNeedsWork", config.getBlockMergeIfPrNeedsWork() == null ? "" : config.getBlockMergeIfPrNeedsWork(),
         "requiredReviewers", utils.dereferenceUsers(newArrayList(newHashSet(concat(
             utils.dereferenceGroups(config.getRequiredReviewerGroups()),
             config.getRequiredReviewers())))),

@@ -3,6 +3,7 @@ package com.monitorjbl.plugins;
 import com.atlassian.bitbucket.project.Project;
 import com.atlassian.bitbucket.pull.PullRequest;
 import com.atlassian.bitbucket.pull.PullRequestParticipant;
+import com.atlassian.bitbucket.pull.PullRequestParticipantStatus;
 import com.atlassian.bitbucket.pull.PullRequestRef;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.scm.pull.MergeRequest;
@@ -150,6 +151,60 @@ public class MergeBlockerTest {
         .requiredReviewers(newArrayList("user2"))
         .requiredReviews(1)
         .build());
+    sut.check(merge);
+    verify(merge, never()).veto(anyString(), anyString());
+  }
+
+  @Test
+  public void testBlocking_prNeedsWorkEnabledAndOneNeedsWorkSet() throws Exception {
+    final PullRequestParticipant reviewer = mockParticipant("user2", true);
+    when(reviewer.getStatus()).thenReturn(PullRequestParticipantStatus.NEEDS_WORK);
+    Set<PullRequestParticipant> p = newHashSet(
+            reviewer
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getParticipants()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+            .blockMergeIfPrNeedsWork(true)
+            .build());
+    sut.check(merge);
+    verify(merge).veto(anyString(), anyString());
+  }
+
+  @Test
+  public void testBlocking_prNeedsWorkEnabledAndNoNeedsWorkSet() throws Exception {
+    final PullRequestParticipant reviewer = mockParticipant("user2", true);
+    when(reviewer.getStatus()).thenReturn(PullRequestParticipantStatus.APPROVED);
+    Set<PullRequestParticipant> p = newHashSet(
+            reviewer
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getParticipants()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+            .blockMergeIfPrNeedsWork(true)
+            .build());
+    sut.check(merge);
+    verify(merge, never()).veto(anyString(), anyString());
+  }
+
+  @Test
+  public void testBlocking_prNeedsWorkDisabledAndOneNeedsWorkSet() throws Exception {
+    final PullRequestParticipant reviewer = mockParticipant("user2", true);
+    when(reviewer.getStatus()).thenReturn(PullRequestParticipantStatus.NEEDS_WORK);
+    Set<PullRequestParticipant> p = newHashSet(
+            reviewer
+    );
+    PullRequestParticipant author = mockParticipant("user1", false);
+    when(pr.getReviewers()).thenReturn(p);
+    when(pr.getParticipants()).thenReturn(p);
+    when(pr.getAuthor()).thenReturn(author);
+    when(configDao.getConfigForRepo(project.getKey(), repository.getSlug())).thenReturn(Config.builder()
+            .blockMergeIfPrNeedsWork(false)
+            .build());
     sut.check(merge);
     verify(merge, never()).veto(anyString(), anyString());
   }
