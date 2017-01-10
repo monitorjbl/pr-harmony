@@ -44,7 +44,7 @@ public class MergeBlocker implements MergeRequestCheck {
         final Boolean blockAutoMergeBecausePrNeedsWork = needsWork != null && needsWork && needsWork(pr);
 
         if (blockAutoMergeBecausePrNeedsWork) {
-          mergeRequest.veto("PR marked as Needs Work from reviewer(s)", "Resolve it before merge.");
+          mergeRequest.veto("Needs work", "PR marked as Needs Work from reviewer(s)");
         }
       }
     }
@@ -53,7 +53,7 @@ public class MergeBlocker implements MergeRequestCheck {
   private boolean needsWork(final PullRequest pr) {
     boolean needsWork = false;
 
-    for (PullRequestParticipant reviewer : pr.getParticipants()) {
+    for (PullRequestParticipant reviewer : pr.getReviewers()) {
       if (reviewer.getStatus() == PullRequestParticipantStatus.NEEDS_WORK) {
         needsWork = true;
         break;
