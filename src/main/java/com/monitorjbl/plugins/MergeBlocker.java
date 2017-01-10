@@ -40,7 +40,8 @@ public class MergeBlocker implements MergeRequestCheck {
         mergeRequest.veto("Required reviewers must approve", (config.getRequiredReviews() - approval.seenReviewers(pr).size()) +
             " more approvals required from the following users: " + Joiner.on(", ").join(missing));
       } else {
-        final Boolean blockAutoMergeBecausePrNeedsWork = config.getBlockMergeIfPrNeedsWork() && needsWork(pr);
+        Boolean needsWork = config.getBlockMergeIfPrNeedsWork();
+        final Boolean blockAutoMergeBecausePrNeedsWork = needsWork != null && needsWork && needsWork(pr);
 
         if (blockAutoMergeBecausePrNeedsWork) {
           mergeRequest.veto("PR marked as Needs Work from reviewer(s)", "Resolve it before merge.");
