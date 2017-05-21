@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.monitorjbl.plugins</groupId>
   <artifactId>pr-harmony</artifactId>
-  <version>2.3.5</version>
+  <version>2.4.0</version>
   <packaging>atlassian-plugin</packaging>
 
   <name>PR Harmony</name>
@@ -68,6 +68,14 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>21.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Base test dependencies -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
@@ -116,9 +124,22 @@
       <version>1.7.12</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-firefox-driver</artifactId>
+      <version>2.53.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
+    <testSourceDirectory>${project.basedir}/src/test/java/ut</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
@@ -145,13 +166,48 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>integration</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>${project.basedir}/src/test/java/it</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <properties>
-    <bitbucket.version>4.4.0</bitbucket.version>
-    <bitbucket.data.version>4.4.0</bitbucket.data.version>
-    <amps.version>6.1.0</amps.version>
+    <bitbucket.version>5.0.1</bitbucket.version>
+    <bitbucket.data.version>5.0.1</bitbucket.data.version>
+    <amps.version>6.3.0</amps.version>
     <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
