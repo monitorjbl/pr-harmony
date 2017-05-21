@@ -77,15 +77,23 @@ define('pr-harmony-create', [
     return currentRequiredReviewers().length < config.requiredReviews;
   }
 
+  function enableSubmit(){
+    $('#submit-form').prop('disabled', false);
+  }
+
+  function disableSubmit(){
+    $('#submit-form').prop('disabled', true);
+  }
+
   function handleChange() {
     if (isSubmitEnabled()) {
       log('Disabling submit button');
       showFlag();
-      $('#submit-form').prop('disabled', true);
+      disableSubmit();
     } else {
       log('Enabling submit button');
       closeFlag();
-      $('#submit-form').prop('disabled', false);
+      enableSubmit();
     }
   }
 
@@ -140,11 +148,16 @@ define('pr-harmony-create', [
 
   exports.init = function () {
     var load = function () {
-      fetchConfig(function () {
-        addAllUsers();
-        handleChange();
-      });
+      disableSubmit();
+      setTimeout(function(){
+        fetchConfig(function () {
+          addAllUsers();
+          handleChange();
+        });
+      }, 250);
     };
+
+    // For posterity, you can see all triggered events by adding this query parameter to the URL: eve=*
     events.on("bitbucket.model.page-state.changed.targetBranch", load);
     events.on("bitbucket.feature.compare.form.state", load);
     $('#show-create-pr-button').click(load);

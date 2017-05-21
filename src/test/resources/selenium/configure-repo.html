@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:7990/" />
+<title>config-test</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">config-test</td></tr>
+</thead><tbody>
+<!---- Configure PR Harmony-->
+<tr>
+	<td>clickAndWait</td>
+	<td>css=span.aui-icon.icon-settings</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=PR Harmony</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>id=s2id_autogen1</td>
+	<td></td>
+</tr>
+<!---- Add admin to Default users-->
+<tr>
+	<td>click</td>
+	<td>id=s2id_autogen1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>sendKeys</td>
+	<td>id=s2id_autogen1</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=.select2-result-label &gt; div:nth-child(1)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>css=.select2-results-dept-0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=#s2id_defaultReviewers &gt; ul:nth-child(1) &gt; li:nth-child(1)</td>
+	<td></td>
+</tr>
+<!---- Add user to Default users-->
+<tr>
+	<td>click</td>
+	<td>id=s2id_autogen1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>sendKeys</td>
+	<td>id=s2id_autogen1</td>
+	<td>user</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=.select2-result-label &gt; div:nth-child(1)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>css=.select2-results-dept-0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=#s2id_defaultReviewers &gt; ul:nth-child(1) &gt; li:nth-child(2)</td>
+	<td></td>
+</tr>
+<!---- Add admin to Required users-->
+<tr>
+	<td>click</td>
+	<td>id=s2id_autogen2</td>
+	<td></td>
+</tr>
+<tr>
+	<td>sendKeys</td>
+	<td>id=s2id_autogen2</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=.select2-result-label &gt; div:nth-child(1)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>css=.select2-results-dept-0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=#s2id_requiredReviewers &gt; ul:nth-child(1) &gt; li:nth-child(1)</td>
+	<td></td>
+</tr>
+<!---- Add user to Required users-->
+<tr>
+	<td>click</td>
+	<td>id=s2id_autogen2</td>
+	<td></td>
+</tr>
+<tr>
+	<td>sendKeys</td>
+	<td>id=s2id_autogen2</td>
+	<td>user</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=.select2-result-label &gt; div:nth-child(1)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>css=.select2-results-dept-0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=#s2id_requiredReviewers &gt; ul:nth-child(1) &gt; li:nth-child(2)</td>
+	<td></td>
+</tr>
+<!---- Set Required reviews-->
+<tr>
+	<td>type</td>
+	<td>id=requiredReviews</td>
+	<td>1</td>
+</tr>
+<!---- Set Blocked commits-->
+<tr>
+	<td>type</td>
+	<td>id=blockedCommits</td>
+	<td>master</td>
+</tr>
+<!---- Set Excluded users-->
+<tr>
+	<td>click</td>
+	<td>id=s2id_autogen3</td>
+	<td></td>
+</tr>
+<tr>
+	<td>sendKeys</td>
+	<td>id=s2id_autogen3</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=.select2-result-label &gt; div:nth-child(1)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>css=.select2-results-dept-0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=#s2id_excludedUsers &gt; ul:nth-child(1) &gt; li:nth-child(2)</td>
+	<td></td>
+</tr>
+<!---- Click Save-->
+<tr>
+	<td>clickAndWait</td>
+	<td>id=saveButton</td>
+	<td></td>
+</tr>
+</tbody></table>
+</body>
+</html>
