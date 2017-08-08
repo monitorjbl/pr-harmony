@@ -20,6 +20,7 @@ public class AsyncProcessor {
     this.concurrencyService = concurrencyService;
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends Serializable> void dispatch(String bucketName, T taskRequest, TaskProcessor taskProcessor) {
     BucketedExecutor<T> exec = concurrencyService.getBucketedExecutor(
         PREFIX + bucketName,
