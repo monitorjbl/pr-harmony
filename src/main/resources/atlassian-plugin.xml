@@ -18,12 +18,14 @@
   <component-import key="renderer"
                     interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer"/>
   <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+  <component-import key="concurrencyService" interface="com.atlassian.bitbucket.concurrent.ConcurrencyService"/>
 
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
   <component key="mergeBlocker" class="com.monitorjbl.plugins.MergeBlocker"/>
   <component key="prListener" class="com.monitorjbl.plugins.PullRequestListener"/>
   <component key="regexUtils" class="com.monitorjbl.plugins.RegexUtils"/>
   <component key="userUtils" class="com.monitorjbl.plugins.UserUtils"/>
+  <component key="asyncProcessor" class="com.monitorjbl.plugins.AsyncProcessor"/>
 
   <template-context-item key="applicationPropertiesContextItem" component-ref="applicationProperties"
                          context-key="applicationProperties" name="Application Properties Context Item"/>

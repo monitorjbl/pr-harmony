@@ -13,6 +13,7 @@ import com.atlassian.bitbucket.user.EscalatedSecurityContext;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Operation;
 import com.google.common.collect.Lists;
+import com.monitorjbl.plugins.AsyncProcessor.TaskContext;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 import org.junit.Before;
@@ -65,6 +66,8 @@ public class PullRequestListenerTest {
   @Mock
   PullRequestMergeability mergeability;
 
+  TaskContext ctx;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -88,12 +91,13 @@ public class PullRequestListenerTest {
     when(userUtils.dereferenceGroups(anyList())).thenReturn(Lists.<String>newArrayList());
     when(regexUtils.match(anyList(), anyString())).thenCallRealMethod();
     when(regexUtils.formatBranchName(anyString())).thenCallRealMethod();
+    ctx = new TaskContext(configDao, userUtils, null, prService, null, securityService, null);
   }
 
   @Test
   public void testAutomerge_defaultConfig() throws Exception {
     when(configDao.getConfigForRepo(project.getKey(), toRepo.getSlug())).thenReturn(Config.builder().build());
-    sut.automergePullRequest(pr);
+    sut.automergePullRequest(ctx, pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
@@ -103,7 +107,7 @@ public class PullRequestListenerTest {
         .automergePRs(newArrayList("master"))
         .blockedPRs(newArrayList("master"))
         .build());
-    sut.automergePullRequest(pr);
+    sut.automergePullRequest(ctx, pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 
@@ -116,7 +120,7 @@ public class PullRequestListenerTest {
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
         .build());
-    sut.automergePullRequest(pr);
+    sut.automergePullRequest(ctx, pr);
     verify(prService, times(1)).merge(any(PullRequestMergeRequest.class));
   }
 
@@ -129,7 +133,7 @@ public class PullRequestListenerTest {
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
         .build());
-    sut.automergePullRequest(pr);
+    sut.automergePullRequest(ctx, pr);
     verify(prService, never()).merge(any(PullRequestMergeRequest.class));
   }
 

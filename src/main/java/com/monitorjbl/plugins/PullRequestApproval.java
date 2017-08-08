@@ -59,11 +59,7 @@ public class PullRequestApproval {
   }
 
   Map<String, PullRequestParticipant> transformReviewers(PullRequest pr) {
-    return uniqueIndex(pr.getReviewers(), new Function<PullRequestParticipant, String>() {
-      public String apply(PullRequestParticipant input) {
-        return input.getUser().getSlug();
-      }
-    });
+    return uniqueIndex(pr.getReviewers(), input -> input.getUser().getSlug());
   }
 
   Boolean reviewerIsMissing(PullRequestParticipant reviewer) {
