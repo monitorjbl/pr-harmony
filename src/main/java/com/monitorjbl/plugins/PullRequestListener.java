@@ -14,11 +14,9 @@ import com.atlassian.bitbucket.util.Page;
 import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.atlassian.event.api.EventListener;
-import com.monitorjbl.plugins.AsyncProcessor.TaskProcessor;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PullRequestListener {
@@ -33,9 +31,6 @@ public class PullRequestListener {
   private final SecurityService securityService;
   private final RegexUtils regexUtils;
 
-  private final ApprovalTaskProcessor approvalTaskProcessor = new ApprovalTaskProcessor();
-  private final BuildTaskProcessor buildTaskProcessor = new BuildTaskProcessor();
-
   public PullRequestListener(AsyncProcessor asyncProcessor, ConfigDao configDao, PullRequestService prService,
                              SecurityService securityService, RegexUtils regexUtils) {
     this.asyncProcessor = asyncProcessor;
@@ -47,12 +42,12 @@ public class PullRequestListener {
 
   @EventListener
   public void prApprovalListener(PullRequestParticipantStatusUpdatedEvent event) {
-    asyncProcessor.dispatch(PR_APPROVE_BUCKET, new ApprovalTask(event.getPullRequest()), approvalTaskProcessor);
+    asyncProcessor.dispatch(new ApprovalTaskProcessor(event.getPullRequest()));
   }
 
   @EventListener
   public void buildStatusListener(BuildStatusSetEvent event) {
-    asyncProcessor.dispatch(BUILD_APPROVE_BUCKET, new ApprovalTask(event.getCommitId()), buildTaskProcessor);
+    asyncProcessor.dispatch(new BuildTaskProcessor(event.getCommitId()));
   }
 
   void automergePullRequest(PullRequest pr) {
@@ -102,46 +97,39 @@ public class PullRequestListener {
     return null;
   }
 
-  private class ApprovalTaskProcessor extends TaskProcessor<ApprovalTask> {
+  private class ApprovalTaskProcessor implements Runnable {
+
+    private final PullRequest pr;
+
+    public ApprovalTaskProcessor(PullRequest pr) {
+      this.pr = pr;
+    }
+
     @Override
-    public void handleTask(ApprovalTask task) {
+    public void run() {
       securityService.withPermission(Permission.ADMIN, "Automerge check (PR approval)").call(() -> {
-        automergePullRequest(prService.getById(task.repositoryId, task.pullRequestId));
+        automergePullRequest(prService.getById(pr.getToRef().getRepository().getId(), pr.getId()));
         return null;
       });
     }
   }
 
-  private class BuildTaskProcessor extends TaskProcessor<ApprovalTask> {
+  private class BuildTaskProcessor implements Runnable {
+    private final String commitId;
+
+    public BuildTaskProcessor(String commitId) {
+      this.commitId = commitId;
+    }
+
     @Override
-    public void handleTask(ApprovalTask task) {
+    public void run() {
       securityService.withPermission(Permission.ADMIN, "Automerge check (PR approval)").call(() -> {
-        PullRequest pr = findPRByCommitId(task.commitId);
+        PullRequest pr = findPRByCommitId(commitId);
         if(pr != null) {
           automergePullRequest(pr);
         }
         return null;
       });
-    }
-  }
-
-  public static class ApprovalTask implements Serializable {
-    public final Long pullRequestId;
-    public final int repositoryId;
-    public final String commitId;
-
-    public ApprovalTask(String commitId) {
-      this(null, -1, commitId);
-    }
-
-    public ApprovalTask(PullRequest pr) {
-      this(pr.getId(), pr.getToRef().getRepository().getId(), null);
-    }
-
-    public ApprovalTask(Long pullRequestId, Integer repositoryId, String commitId) {
-      this.pullRequestId = pullRequestId;
-      this.repositoryId = repositoryId;
-      this.commitId = commitId;
     }
   }
 

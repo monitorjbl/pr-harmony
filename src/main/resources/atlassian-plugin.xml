@@ -18,7 +18,7 @@
   <component-import key="renderer"
                     interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer"/>
   <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
-  <component-import key="concurrencyService" interface="com.atlassian.bitbucket.concurrent.ConcurrencyService"/>
+  <component-import key="executorService" interface="java.util.concurrent.ExecutorService"/>
 
   <component key="config" class="com.monitorjbl.plugins.config.ConfigDao"/>
   <component key="mergeBlocker" class="com.monitorjbl.plugins.MergeBlocker"/>
