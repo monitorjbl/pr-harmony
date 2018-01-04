@@ -4,9 +4,8 @@ jdk:
    - oraclejdk8
 build:
   pre_ci_boot:
-    image_name: drydock/u16javall
-    image_tag: v5.8.2
-install:
-   - mvn clean install -DskipTests -B -s settings.xml
-script:
-   - mvn clean package -B -s settings.xml
+    image_name: maven
+    image_tag: 3.5-jdk-8
+  ci:
+    - mvn clean install -DskipTests -B -s settings.xml
+    - mvn clean package -B -s settings.xml
