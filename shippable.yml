@@ -2,6 +2,10 @@ language: java
 
 jdk:
    - oraclejdk8
+build:
+  pre_ci_boot:
+    image_name: drydock/u16javall
+    image_tag: v5.8.2
 install:
    - mvn clean install -DskipTests -B -s settings.xml
 script:
