@@ -6,9 +6,11 @@ import com.atlassian.bitbucket.project.Project;
 import com.atlassian.bitbucket.pull.PullRequest;
 import com.atlassian.bitbucket.pull.PullRequestMergeRequest;
 import com.atlassian.bitbucket.pull.PullRequestMergeability;
+import com.atlassian.bitbucket.pull.PullRequestParticipant;
 import com.atlassian.bitbucket.pull.PullRequestRef;
 import com.atlassian.bitbucket.pull.PullRequestService;
 import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.user.ApplicationUser;
 import com.atlassian.bitbucket.user.EscalatedSecurityContext;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Operation;
@@ -16,7 +18,6 @@ import com.google.common.collect.Lists;
 import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,7 +36,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
-@Ignore
 public class PullRequestListenerTest {
   @Mock
   private ConfigDao configDao;
@@ -66,16 +66,25 @@ public class PullRequestListenerTest {
   PullRequestRef fromRef;
   @Mock
   PullRequestMergeability mergeability;
+  @Mock
+  PullRequestParticipant author;
+  @Mock
+  ApplicationUser authorUser;
+  @Mock
+  EscalatedSecurityContext securityContext;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     when(securityService.withPermission(any(Permission.class), anyString())).thenReturn(new MockSecurityContext());
     when(openedEvent.getPullRequest()).thenReturn(pr);
+    when(authorUser.getSlug()).thenReturn("someguy");
+    when(author.getUser()).thenReturn(authorUser);
     when(pr.getToRef()).thenReturn(toRef);
     when(pr.getFromRef()).thenReturn(fromRef);
     when(pr.getId()).thenReturn(10L);
     when(pr.getVersion()).thenReturn(10384);
+    when(pr.getAuthor()).thenReturn(author);
     when(toRef.getRepository()).thenReturn(toRepo);
     when(toRef.getId()).thenReturn(RegexUtils.REFS_PREFIX + "master");
     when(fromRef.getRepository()).thenReturn(fromRepo);
@@ -118,6 +127,11 @@ public class PullRequestListenerTest {
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
         .build());
+    when(securityService.impersonating(any(), any())).thenReturn(securityContext);
+    when(securityContext.call(any())).then(inv -> {
+      ((Operation) inv.getArguments()[0]).perform();
+      return null;
+    });
     sut.automergePullRequest(pr);
     verify(prService, times(1)).merge(any(PullRequestMergeRequest.class));
   }

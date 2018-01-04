@@ -1,7 +1,6 @@
 package com.monitorjbl.plugins;
 
 import com.atlassian.bitbucket.build.BuildStatusSetEvent;
-import com.atlassian.bitbucket.commit.Commit;
 import com.atlassian.bitbucket.event.pull.PullRequestParticipantStatusUpdatedEvent;
 import com.atlassian.bitbucket.permission.Permission;
 import com.atlassian.bitbucket.pull.PullRequest;
@@ -12,6 +11,7 @@ import com.atlassian.bitbucket.pull.PullRequestState;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.util.Page;
+import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.atlassian.event.api.EventListener;
 import com.monitorjbl.plugins.AsyncProcessor.TaskProcessor;
@@ -19,11 +19,13 @@ import com.monitorjbl.plugins.config.Config;
 import com.monitorjbl.plugins.config.ConfigDao;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PullRequestListener {
   private static final String PR_APPROVE_BUCKET = "AUTOMERGE_PR_APPROVAL";
   private static final String BUILD_APPROVE_BUCKET = "AUTOMERGE_BUILD_APPROVAL";
   public static final int MAX_COMMITS = 1048576;
+  public static final int SEARCH_PAGE_SIZE = 50;
 
   private final AsyncProcessor asyncProcessor;
   private final ConfigDao configDao;
@@ -69,21 +71,33 @@ public class PullRequestListener {
   }
 
   PullRequest findPRByCommitId(String commitId) {
-    int start = 0;
-    Page<PullRequest> requests = null;
-    while(requests == null || requests.getSize() > 0) {
-      requests = prService.search(new PullRequestSearchRequest.Builder()
-          .state(PullRequestState.OPEN)
-          .build(), new PageRequestImpl(start, 10));
-      for(PullRequest pr : requests.getValues()) {
-        Page<Commit> commits = prService.getCommits(pr.getToRef().getRepository().getId(), pr.getId(), new PageRequestImpl(0, MAX_COMMITS));
-        for(Commit c : commits.getValues()) {
-          if(c.getId().equals(commitId)) {
-            return pr;
-          }
-        }
+    PullRequestSearchRequest request = new PullRequestSearchRequest.Builder()
+        .state(PullRequestState.OPEN)
+        .withProperties(false)
+        .build();
+    PageRequest nextPage = new PageRequestImpl(0, SEARCH_PAGE_SIZE);
+    do {
+      Page<PullRequest> page = prService.search(request, nextPage);
+      PullRequest pr = searchForPR(page, commitId);
+      if(pr != null) {
+        return pr;
+      } else {
+        nextPage = page.getNextPageRequest();
       }
-      start += 10;
+    } while(nextPage != null);
+    return null;
+  }
+
+  private PullRequest searchForPR(Page<PullRequest> requests, String commitId) {
+    for(PullRequest pr : requests.getValues()) {
+      AtomicBoolean found = new AtomicBoolean(false);
+      prService.streamCommits(pr.getToRef().getRepository().getId(), pr.getId(), commit -> {
+        found.set(commit.getId().equals(commitId));
+        return !found.get();
+      });
+      if(found.get()) {
+        return pr;
+      }
     }
     return null;
   }
@@ -130,4 +144,5 @@ public class PullRequestListener {
       this.commitId = commitId;
     }
   }
+
 }
