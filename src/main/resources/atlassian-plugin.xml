@@ -25,7 +25,10 @@
   <component key="prListener" class="com.monitorjbl.plugins.PullRequestListener"/>
   <component key="regexUtils" class="com.monitorjbl.plugins.RegexUtils"/>
   <component key="userUtils" class="com.monitorjbl.plugins.UserUtils"/>
-  <component key="asyncProcessor" class="com.monitorjbl.plugins.AsyncProcessor"/>
+  <!-- This is declared public so its LifecycleAware behaviors can be invoked by SAL -->
+  <component key="asyncProcessor" class="com.monitorjbl.plugins.AsyncProcessor" public="true">
+    <interface>com.atlassian.sal.api.lifecycle.LifecycleAware</interface>
+  </component>
 
   <template-context-item key="applicationPropertiesContextItem" component-ref="applicationProperties"
                          context-key="applicationProperties" name="Application Properties Context Item"/>

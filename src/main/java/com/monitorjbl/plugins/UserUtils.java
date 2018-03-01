@@ -2,14 +2,18 @@ package com.monitorjbl.plugins;
 
 import com.atlassian.bitbucket.user.ApplicationUser;
 import com.atlassian.bitbucket.user.UserService;
-import com.atlassian.bitbucket.util.PageRequestImpl;
+import com.atlassian.bitbucket.util.PagedIterable;
 import com.monitorjbl.plugins.config.User;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.atlassian.bitbucket.util.MoreStreams.streamIterable;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 public class UserUtils {
   private static final int RESULTS_PER_REQUEST = 25;
@@ -19,44 +23,44 @@ public class UserUtils {
     this.userService = userService;
   }
 
-  public List<User> dereferenceUsers(Iterable<String> users) {
-    List<User> list = newArrayList();
-    for(String u : users) {
-      Optional<User> user = getUserByName(u);
-      if(user.isPresent()) {
-        list.add(user.get());
-      }
+  public List<User> dereferenceUsers(Collection<String> usernames) {
+    Set<String> distinctNames = new HashSet<>(usernames);
+    if (distinctNames.isEmpty()) {
+      return Collections.emptyList();
     }
-    return list;
-  }
 
-  public Optional<User> getUserByName(String username) {
-    ApplicationUser user = userService.getUserByName(username);
-    return user == null ? Optional.empty() : Optional.of(new User(user.getName(), user.getDisplayName()));
+    Set<ApplicationUser> usersByName = userService.getUsersByName(distinctNames);
+    if (usersByName.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return usersByName.stream()
+        .map(user -> new User(user.getName(), user.getDisplayName()))
+        .collect(toList());
   }
 
   public String getUserDisplayNameByName(String username) {
-	    ApplicationUser user = userService.getUserByName(username);  
-	    return user.getDisplayName() == null ? username : user.getDisplayName();
+    return ofNullable(userService.getUserByName(username))
+        .map(ApplicationUser::getDisplayName)
+        .orElse(username);
   }
   
   public ApplicationUser getApplicationUserByName(String username) {
     return userService.getUserByName(username);
   }
 
-  public List<String> dereferenceGroups(List<String> groups) {
-    List<String> users = newArrayList();
-    for(String group : groups) {
-      List<ApplicationUser> results = newArrayList(userService.findUsersByGroup(group, new PageRequestImpl(0, RESULTS_PER_REQUEST)).getValues());
-      for(int i = 1; results.size() > 0; i++) {
-        users.addAll(results.stream()
-            .map(ApplicationUser::getSlug)
-            .collect(Collectors.toList()));
-        results = newArrayList(userService.findUsersByGroup(group, new PageRequestImpl(i * RESULTS_PER_REQUEST, RESULTS_PER_REQUEST)).getValues());
-      }
-    }
-    return users;
+  public List<String> dereferenceGroups(Collection<String> groups) {
+    return groups.stream()
+        //Replace each group with a stream of the users in that group
+        .flatMap(group ->
+            streamIterable(new PagedIterable<>(
+                pageRequest -> userService.findUsersByGroup(group, pageRequest),
+                RESULTS_PER_REQUEST)))
+        //Transform each user to its slug
+        .map(ApplicationUser::getSlug)
+        //Drop any duplicates for users who exist in multiple groups
+        .distinct()
+        //Return a list of the distinct slugs
+        .collect(toList());
   }
-
-
 }

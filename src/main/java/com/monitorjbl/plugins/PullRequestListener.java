@@ -20,9 +20,6 @@ import com.monitorjbl.plugins.config.ConfigDao;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PullRequestListener {
-  private static final String PR_APPROVE_BUCKET = "AUTOMERGE_PR_APPROVAL";
-  private static final String BUILD_APPROVE_BUCKET = "AUTOMERGE_BUILD_APPROVAL";
-  public static final int MAX_COMMITS = 1048576;
   public static final int SEARCH_PAGE_SIZE = 50;
 
   private final AsyncProcessor asyncProcessor;

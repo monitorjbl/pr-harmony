@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>com.monitorjbl.plugins</groupId>
   <artifactId>pr-harmony</artifactId>
-  <version>2.5.0</version>
+  <version>2.5.1-SNAPSHOT</version>
   <packaging>atlassian-plugin</packaging>
 
   <name>PR Harmony</name>
@@ -33,11 +33,26 @@
       <groupId>com.atlassian.bitbucket.server</groupId>
       <artifactId>bitbucket-api</artifactId>
       <scope>provided</scope>
-      <version>4.11.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.atlassian.bitbucket.server</groupId>
+      <artifactId>bitbucket-build-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.atlassian.bitbucket.server</groupId>
       <artifactId>bitbucket-spi</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.atlassian.bitbucket.server</groupId>
+      <artifactId>bitbucket-util</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.atlassian.plugins.rest</groupId>
+      <artifactId>atlassian-rest-common</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -46,51 +61,51 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.atlassian.bitbucket.server</groupId>
-      <artifactId>bitbucket-build-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.atlassian.templaterenderer</groupId>
       <artifactId>atlassian-template-renderer-api</artifactId>
-      <version>1.5.7</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>21.0</version>
       <scope>provided</scope>
     </dependency>
 
     <!-- Base test dependencies -->
     <dependency>
+      <groupId>com.atlassian.bitbucket.server</groupId>
+      <artifactId>bitbucket-it-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.atlassian.bitbucket.server</groupId>
+      <artifactId>bitbucket-page-objects</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
+      <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.9.5</version>
       <exclusions>
         <exclusion>
           <groupId>org.hamcrest</groupId>
@@ -99,47 +114,9 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
-
-    <!-- WIRED TEST RUNNER DEPENDENCIES -->
-    <dependency>
-      <groupId>com.atlassian.plugins</groupId>
-      <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-      <version>${plugin.testrunner.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.1.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.2.2-atlassian-1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-firefox-driver</artifactId>
-      <version>2.53.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
-    <testSourceDirectory>${project.basedir}/src/test/java/ut</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
@@ -151,64 +128,55 @@
             <product>
               <id>bitbucket</id>
               <instanceId>bitbucket</instanceId>
-              <version>${bitbucket.version}</version>
-              <dataVersion>${bitbucket.data.version}</dataVersion>
+              <version>${bitbucket.test.version}</version>
+              <dataVersion>${bitbucket.test.version}</dataVersion>
             </product>
           </products>
+          <testGroups>
+            <testGroup>
+              <id>bitbucket-integration</id>
+              <includes>
+                <include>it/**/*.java</include>
+              </includes>
+              <productIds>
+                <productId>bitbucket</productId>
+              </productIds>
+            </testGroup>
+          </testGroups>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.7.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.20.1</version>
+        <configuration>
+            <excludes>
+              <exclude>it/**/*.java</exclude>
+            </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>integration</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>${project.basedir}/src/test/java/it</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
   <properties>
-    <bitbucket.version>5.0.1</bitbucket.version>
-    <bitbucket.data.version>5.0.1</bitbucket.data.version>
-    <amps.version>6.3.0</amps.version>
+    <bitbucket.version>4.8.6</bitbucket.version>
+    <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
+    <!-- This separate version allows testing the plugin with a different version of the system than
+         it's compiled against, which is useful for testing compatibility with multiple versions -->
+    <bitbucket.test.version>${bitbucket.version}</bitbucket.test.version>
+    <amps.version>6.3.14</amps.version>
     <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Skip executing integration tests by default. They can be run by adding -DskipITs=false when running Maven -->
+    <skipITs>true</skipITs>
   </properties>
 </project>
