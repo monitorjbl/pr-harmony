@@ -5,88 +5,80 @@ import com.atlassian.bitbucket.permission.PermissionService;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.repository.RepositoryService;
 import com.atlassian.bitbucket.user.ApplicationUser;
-import com.atlassian.sal.api.auth.LoginUriProvider;
-import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.monitorjbl.plugins.UserUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
-import java.util.Map;
 
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("unchecked")
+@RunWith(MockitoJUnitRunner.class)
 public class ConfigServletTest {
-  @Mock
-  private UserManager userManager;
-  @Mock
-  private UserUtils userUtils;
   @Mock
   private RepositoryService repoService;
   @Mock
-  private TemplateRenderer renderer;
-  @Mock
   private PermissionService permissionService;
-  @Mock
-  private LoginUriProvider loginUriProvider;
   @InjectMocks
-  private ConfigServlet sut;
+  private ConfigServlet servlet;
+  @Mock
+  private TemplateRenderer templateRenderer;
 
   @Mock
-  HttpServletResponse response;
+  private Repository repo;
   @Mock
-  ApplicationUser user;
+  private HttpServletResponse response;
   @Mock
-  Repository repo;
+  private ApplicationUser user;
 
   @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-    when(userUtils.getApplicationUserByName("user1")).thenReturn(user);
+  public void setUp() {
     when(repoService.getBySlug("PRJ", "repo1")).thenReturn(repo);
     when(permissionService.hasRepositoryPermission(user, repo, Permission.REPO_ADMIN)).thenReturn(true);
+    when(user.getName()).thenReturn("user1");
   }
 
   @Test
   public void testFoundRepo() throws Exception {
-    sut.handleRequest("/plugins/servlet/pr-harmony/PRJ/repo1", "user1", response);
-    verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
-    verify(renderer, times(1)).render(anyString(), any(Map.class), any(Writer.class));
+    servlet.handleRequest("/plugins/servlet/pr-harmony/PRJ/repo1", user, response);
+    verify(response).setStatus(HttpServletResponse.SC_OK);
+    verify(templateRenderer).render(anyString(), anyMapOf(String.class, Object.class), any(Writer.class));
   }
 
   @Test
   public void testFoundRepo_differentContext() throws Exception {
-    sut.handleRequest("/bitbucket/plugins/servlet/pr-harmony/PRJ/repo1", "user1", response);
-    verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
-    verify(renderer, times(1)).render(anyString(), any(Map.class), any(Writer.class));
+    servlet.handleRequest("/bitbucket/plugins/servlet/pr-harmony/PRJ/repo1", user, response);
+    verify(response).setStatus(HttpServletResponse.SC_OK);
+    verify(templateRenderer).render(anyString(), anyMapOf(String.class, Object.class), any(Writer.class));
   }
 
   @Test
   public void testHandleMalformedRequest() throws Exception {
-    sut.handleRequest("/plugins/servlet/saywhat/pr-harmony/PRJ/repo1", "user1", response);
-    verify(response, atLeastOnce()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    servlet.handleRequest("/plugins/servlet/saywhat/pr-harmony/PRJ/repo1", user, response);
+    verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
   }
 
   @Test
   public void testHandleMissingRepo() throws Exception {
-    sut.handleRequest("/plugins/servlet/pr-harmony/FAKE/repo1", "user1", response);
-    verify(response, atLeastOnce()).setStatus(HttpServletResponse.SC_NOT_FOUND);
+    servlet.handleRequest("/plugins/servlet/pr-harmony/FAKE/repo1", user, response);
+    verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
   }
 
   @Test
   public void testPermissionDenied() throws Exception {
-    sut.handleRequest("/plugins/servlet/pr-harmony/PRJ/repo1", "nonuser1", response);
-    verify(response, atLeastOnce()).setStatus(HttpServletResponse.SC_FORBIDDEN);
+    reset(permissionService);
+
+    servlet.handleRequest("/plugins/servlet/pr-harmony/PRJ/repo1", user, response);
+    verify(response).setStatus(HttpServletResponse.SC_FORBIDDEN);
   }
 }

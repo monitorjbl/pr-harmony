@@ -2,13 +2,15 @@ package com.monitorjbl.plugins;
 
 import com.atlassian.bitbucket.pull.PullRequest;
 import com.atlassian.bitbucket.pull.PullRequestParticipant;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.monitorjbl.plugins.config.Config;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -20,15 +22,15 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PullRequestApprovalTest {
   @Mock
-  PullRequest pr;
+  private PullRequest pr;
   @Mock
-  UserUtils utils;
+  private UserUtils utils;
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
     PullRequestParticipant author = mockParticipant("author", false);
     when(pr.getAuthor()).thenReturn(author);
   }
@@ -44,7 +46,7 @@ public class PullRequestApprovalTest {
 
   @Test
   public void testDefaultConfiguration_noRevieiwers() {
-    when(pr.getReviewers()).thenReturn(Sets.<PullRequestParticipant>newHashSet());
+    when(pr.getReviewers()).thenReturn(Collections.emptySet());
     assertThat(new PullRequestApproval(Config.builder().build(), utils).isPullRequestApproved(pr), is(true));
   }
 
@@ -77,7 +79,7 @@ public class PullRequestApprovalTest {
   @Test
   public void testSingleApprover_submitterIsApprover() {
     PullRequestParticipant author = mockParticipant("user1", false);
-    when(pr.getReviewers()).thenReturn(Sets.<PullRequestParticipant>newHashSet());
+    when(pr.getReviewers()).thenReturn(Collections.emptySet());
     when(pr.getAuthor()).thenReturn(author);
     assertThat(new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1"))
@@ -171,7 +173,7 @@ public class PullRequestApprovalTest {
         .requiredReviewers(newArrayList("user1"))
         .requiredReviews(1)
         .build(),
-        utils).missingRevieiwers(pr).size(), is(1));
+        utils).missingReviewers(pr).size(), is(1));
   }
 
   @Test
@@ -186,7 +188,7 @@ public class PullRequestApprovalTest {
         .requiredReviewers(newArrayList("user1", "user2", "user3"))
         .requiredReviews(1)
         .build(),
-        utils).missingRevieiwers(pr).size(), is(2));
+        utils).missingReviewers(pr).size(), is(2));
   }
 
   @Test
@@ -201,7 +203,7 @@ public class PullRequestApprovalTest {
         .requiredReviewers(newArrayList("user1", "user2", "user3"))
         .requiredReviews(1)
         .build(),
-        utils).missingRevieiwers(pr).size(), is(0));
+        utils).missingReviewers(pr).size(), is(0));
   }
 
   @Test
@@ -223,14 +225,14 @@ public class PullRequestApprovalTest {
   }
 
   @Test
-  public void testGroupRequiredReviewers_mixed() throws Exception {
+  public void testGroupRequiredReviewers_mixed() {
     Set<PullRequestParticipant> p = newHashSet(
         mockParticipant("user1", true),
         mockParticipant("user2", true),
         mockParticipant("user3", true)
     );
     when(pr.getReviewers()).thenReturn(p);
-    when(utils.dereferenceGroups(newArrayList("group1"))).thenReturn(newArrayList("user2", "user3"));
+    when(utils.dereferenceGroups(newArrayList("group1"))).thenReturn(ImmutableSet.of("user2", "user3"));
 
     Set<String> seen = new PullRequestApproval(Config.builder()
         .requiredReviewers(newArrayList("user1"))
@@ -246,14 +248,14 @@ public class PullRequestApprovalTest {
   }
 
   @Test
-  public void testGroupRequiredReviewers_groupOnly() throws Exception {
+  public void testGroupRequiredReviewers_groupOnly() {
     Set<PullRequestParticipant> p = newHashSet(
         mockParticipant("user1", true),
         mockParticipant("user2", true),
         mockParticipant("user3", true)
     );
     when(pr.getReviewers()).thenReturn(p);
-    when(utils.dereferenceGroups(newArrayList("group1"))).thenReturn(newArrayList("user2", "user3"));
+    when(utils.dereferenceGroups(newArrayList("group1"))).thenReturn(ImmutableSet.of("user2", "user3"));
 
     Set<String> seen = new PullRequestApproval(Config.builder()
         .requiredReviewerGroups(newArrayList("group1"))
@@ -267,14 +269,14 @@ public class PullRequestApprovalTest {
   }
 
   @Test
-  public void testGroupRequiredReviewers_multipleGroups() throws Exception {
+  public void testGroupRequiredReviewers_multipleGroups() {
     Set<PullRequestParticipant> p = newHashSet(
         mockParticipant("user1", true),
         mockParticipant("user2", true),
         mockParticipant("user3", true)
     );
     when(pr.getReviewers()).thenReturn(p);
-    when(utils.dereferenceGroups(newArrayList("group1", "group2"))).thenReturn(newArrayList("user2", "user3"));
+    when(utils.dereferenceGroups(newArrayList("group1", "group2"))).thenReturn(ImmutableSet.of("user2", "user3"));
 
     Set<String> seen = new PullRequestApproval(Config.builder()
         .requiredReviewerGroups(newArrayList("group1", "group2"))

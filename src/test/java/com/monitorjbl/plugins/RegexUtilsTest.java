@@ -1,42 +1,35 @@
 package com.monitorjbl.plugins;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class RegexUtilsTest {
-  RegexUtils sut = new RegexUtils();
+  RegexUtils regexUtils = new RegexUtils();
 
   @Test
-  public void testSinglePattern() throws Exception {
-    assertTrue(sut.match(newArrayList("bugfix/*"), "bugfix/iss53"));
-    assertFalse(sut.match(newArrayList("test/*"), "bugfix/iss53"));
+  public void testSinglePattern() {
+    assertTrue(regexUtils.match(ImmutableList.of("bugfix/*"), "bugfix/iss53"));
+    assertFalse(regexUtils.match(ImmutableList.of("test/*"), "bugfix/iss53"));
   }
 
   @Test
-  public void testSinglePattern_specialCharacters() throws Exception {
-    assertTrue(sut.match(newArrayList("bug.fix/*"), "bug.fix/iss53"));
-    assertFalse(sut.match(newArrayList("te.st/*"), "bug.fix/iss53"));
+  public void testSinglePattern_specialCharacters() {
+    assertTrue(regexUtils.match(ImmutableList.of("bug.fix/*"), "bug.fix/iss53"));
+    assertFalse(regexUtils.match(ImmutableList.of("te.st/*"), "bug.fix/iss53"));
   }
 
   @Test
-  public void testMultiPattern() throws Exception {
-    assertTrue(sut.match(newArrayList("master", "bugfix/*"), "bugfix/iss53"));
-    assertFalse(sut.match(newArrayList("master", "test/*"), "bugfix/iss53"));
+  public void testMultiPattern() {
+    assertTrue(regexUtils.match(ImmutableList.of("master", "bugfix/*"), "bugfix/iss53"));
+    assertFalse(regexUtils.match(ImmutableList.of("master", "test/*"), "bugfix/iss53"));
   }
 
   @Test
-  public void testExactMatch() throws Exception {
-    assertTrue(sut.match(newArrayList("bugfix/iss53"), "bugfix/iss53"));
-    assertFalse(sut.match(newArrayList("bugfix/iss53"), "bugfix/iss54"));
-  }
-
-  @Test
-  public void testFormatBranchName() throws Exception {
-    assertThat(sut.formatBranchName("refs/heads/master"), equalTo("master"));
+  public void testExactMatch() {
+    assertTrue(regexUtils.match(ImmutableList.of("bugfix/iss53"), "bugfix/iss53"));
+    assertFalse(regexUtils.match(ImmutableList.of("bugfix/iss53"), "bugfix/iss54"));
   }
 }

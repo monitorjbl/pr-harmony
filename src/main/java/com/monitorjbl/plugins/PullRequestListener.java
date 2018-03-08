@@ -50,8 +50,8 @@ public class PullRequestListener {
   void automergePullRequest(PullRequest pr) {
     Repository repo = pr.getToRef().getRepository();
     Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
-    String toBranch = regexUtils.formatBranchName(pr.getToRef().getId());
-    String fromBranch = regexUtils.formatBranchName(pr.getFromRef().getId());
+    String toBranch = pr.getToRef().getDisplayId();
+    String fromBranch = pr.getFromRef().getDisplayId();
 
     if((regexUtils.match(config.getAutomergePRs(), toBranch) || regexUtils.match(config.getAutomergePRsFrom(), fromBranch)) &&
         !regexUtils.match(config.getBlockedPRs(), toBranch) && prService.canMerge(repo.getId(), pr.getId()).canMerge()) {

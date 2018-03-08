@@ -2,7 +2,6 @@ package com.monitorjbl.plugins;
 
 import com.atlassian.bitbucket.pull.PullRequest;
 import com.atlassian.bitbucket.pull.PullRequestParticipant;
-import com.google.common.base.Function;
 import com.monitorjbl.plugins.config.Config;
 
 import java.util.Map;
@@ -29,7 +28,7 @@ public class PullRequestApproval {
     return requiredReviews == null || seenReviewers(pr).size() >= requiredReviews;
   }
 
-  public Set<String> missingRevieiwers(PullRequest pr) {
+  public Set<String> missingReviewers(PullRequest pr) {
     Map<String, PullRequestParticipant> map = transformReviewers(pr);
     Set<String> missingReviewers = newHashSet();
 
@@ -41,7 +40,7 @@ public class PullRequestApproval {
     return missingReviewers;
   }
 
-  public Set<String> missingRevieiwersNames(PullRequest pr) {
+  public Set<String> missingReviewersNames(PullRequest pr) {
     Map<String, PullRequestParticipant> map = transformReviewers(pr);
     Set<String> missingReviewers = newHashSet();
 
@@ -55,7 +54,7 @@ public class PullRequestApproval {
 
   public Set<String> seenReviewers(PullRequest pr) {
     Set<String> required = newHashSet(concat(config.getRequiredReviewers(), utils.dereferenceGroups(config.getRequiredReviewerGroups())));
-    return difference(required, missingRevieiwers(pr));
+    return difference(required, missingReviewers(pr));
   }
 
   Map<String, PullRequestParticipant> transformReviewers(PullRequest pr) {

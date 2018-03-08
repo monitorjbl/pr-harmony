@@ -10,9 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Lists.newArrayList;
-
 @Path("/users/{projectKey}/{repoSlug}")
 public class UserResource {
   private final ConfigDao configDao;
@@ -30,12 +27,8 @@ public class UserResource {
     return Response.ok(ImmutableMap.of(
         "requiredReviews", config.getRequiredReviews() == null ? "" : config.getRequiredReviews(),
         "blockMergeIfPrNeedsWork", config.getBlockMergeIfPrNeedsWork() == null ? "" : config.getBlockMergeIfPrNeedsWork(),
-        "requiredReviewers", newArrayList(concat(
-            utils.dereferenceUsers(config.getRequiredReviewers()),
-            utils.dereferenceGroups(config.getRequiredReviewerGroups()))),
-        "defaultReviewers", newArrayList(concat(
-            utils.dereferenceUsers(config.getDefaultReviewers()),
-            utils.dereferenceGroups(config.getDefaultReviewerGroups())))
+        "requiredReviewers", utils.dereferenceUsers(config.getRequiredReviewers(), config.getRequiredReviewerGroups()),
+        "defaultReviewers", utils.dereferenceUsers(config.getDefaultReviewers(), config.getDefaultReviewerGroups())
     )).build();
   }
 }
