@@ -12,31 +12,32 @@ import com.monitorjbl.plugins.config.ConfigDao;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class MergeBlocker implements MergeRequestCheck {
   private final ConfigDao configDao;
-  private final UserUtils userUtils;
   private final RegexUtils regexUtils;
+  private final UserUtils userUtils;
 
-  public MergeBlocker(ConfigDao configDao, UserUtils userUtils, RegexUtils regexUtils) {
+  public MergeBlocker(ConfigDao configDao, RegexUtils regexUtils, UserUtils userUtils) {
     this.configDao = configDao;
-    this.userUtils = userUtils;
     this.regexUtils = regexUtils;
+    this.userUtils = userUtils;
   }
 
   @Override
   public void check(@Nonnull MergeRequest mergeRequest) {
     PullRequest pr = mergeRequest.getPullRequest();
     Repository repo = pr.getToRef().getRepository();
-    final Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
+    Config config = configDao.getConfigForRepo(repo.getProject().getKey(), repo.getSlug());
 
-    String branch = regexUtils.formatBranchName(pr.getToRef().getId());
+    String branch = pr.getToRef().getDisplayId();
     if (regexUtils.match(config.getBlockedPRs(), branch)) {
       mergeRequest.veto("Pull Request Blocked", "Pull requests have been disabled for branch [" + branch + "]");
     } else {
       PullRequestApproval approval = new PullRequestApproval(config, userUtils);
       if (!approval.isPullRequestApproved(pr)) {
-        Set<String> missing = approval.missingRevieiwersNames(pr);
+        Set<String> missing = approval.missingReviewersNames(pr);
         mergeRequest.veto("Required reviewers must approve", (config.getRequiredReviews() - approval.seenReviewers(pr).size()) +
             " more approvals required from the following users: " + Joiner.on(", ").join(missing));
       } else {
@@ -50,16 +51,9 @@ public class MergeBlocker implements MergeRequestCheck {
     }
   }
 
-  private boolean needsWork(final PullRequest pr) {
-    boolean needsWork = false;
-
-    for (PullRequestParticipant reviewer : pr.getReviewers()) {
-      if (reviewer.getStatus() == PullRequestParticipantStatus.NEEDS_WORK) {
-        needsWork = true;
-        break;
-      }
-    }
-
-    return needsWork;
+  private boolean needsWork(PullRequest pr) {
+    return pr.getReviewers().stream()
+            .map(PullRequestParticipant::getStatus)
+            .anyMatch(Predicate.isEqual(PullRequestParticipantStatus.NEEDS_WORK));
   }
 }
